@@ -3,7 +3,7 @@ import math
 
 pygame.init()
 
-WIDTH, HEIGHT = 700, 700
+WIDTH, HEIGHT = 800, 800
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("The Planetary System")
 
@@ -20,7 +20,7 @@ OFF_WHITE = (190, 190, 190)
 class Planet:
     AU = 149.6e6 * 1000  # average distance from Earth to the Sun in meters
     G = 6.67428e-11  # graviational constant = calculates gravitional force
-    SCALE = 225 / AU  # 1 AU = 100 pixels
+    SCALE = 250 / AU  # 1 AU = 100 pixels
     TIMESTEP = 3600*24  # 1 day elapsed
 
 
@@ -30,17 +30,28 @@ class Planet:
         self.radius = radius
         self.color = color
         self.mass = mass  # in kilograms
+        self.curr_x = 0
+        self.curr_y = 0
 
         self.orbit = []
         self.sun = False
+        self.moon = False
         self.distance_to_sun = 0
+        self.earth = False
 
         self.x_vel = 0
         self.y_vel = 0
 
     def draw(self, win):
-        x = self.x * Planet.SCALE + WIDTH / 2  # adjusts planet position from the center of the screen
-        y = self.y * Planet.SCALE + HEIGHT / 2
+        self.curr_x = self.x * Planet.SCALE + WIDTH / 2  # adjusts planet position from the center of the screen
+        self.curr_y = self.y * Planet.SCALE + HEIGHT / 2
+
+        if self.earth:
+            print(f"earthx: {self.curr_x}")
+            print(f"earthy: {self.curr_y}") 
+        elif self.moon:
+            print(f"moonx: {x}")
+            print(f"moony: {y}") 
 
         if len(self.orbit) > 2:
             updated_points = []
@@ -50,8 +61,8 @@ class Planet:
                 y = y * self.SCALE + HEIGHT / 2
                 updated_points.append((x, y))
             
-            pygame.draw.lines(WINDOW, self.color, False, updated_points, 1)
-        pygame.draw.circle(win, self.color, (x, y), self.radius) 
+            pygame.draw.lines(win, self.color, False, updated_points, 1)
+        pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius) 
 
     def attraction(self, other):  # calculate Newton's law of universal gravition 
         other_x, other_y = other.x, other.y
@@ -76,34 +87,62 @@ class Planet:
             fx, fy = self.attraction(planet)
             total_fx += fx
             total_fy += fy
-        
+
         self.x_vel += total_fx / self.mass * Planet.TIMESTEP  # derives from Newton's law of motion
         self.y_vel += total_fy / self.mass * Planet.TIMESTEP
 
         self.x += self.x_vel * Planet.TIMESTEP  # current position + displacement
         self.y += self.y_vel * Planet.TIMESTEP
         self.orbit.append((self.x, self.y))  # collection of positions to represent orbit path
- 
+
+class Moon(Planet):
+    def __init__(self, x, y, radius, color, mass):
+        super().__init__(x, y, radius, color, mass)
+        self.orbit = []
+        self.angle = 0
+        self.speed = .01
+
+    def draw(self, win, planet):
+        self.angle -= .069
+        self.x = planet.curr_x + (25 * math.cos(self.angle)) # adjusts planet position from the center of the screen
+        self.y = planet.curr_y + (25 * math.sin(self.angle))
+
+        self.orbit.append((self.x, self.y)) # if you want to draw the orbit of the moon
+
+        if self.earth:
+            print(f"earthx: {x}")
+            print(f"earthy: {y}") 
+        elif self.moon:
+            print(f"moonx: {self.x}")
+            print(f"moony: {self.y}") 
+
+        if len(self.orbit) > 2:
+            pygame.draw.lines(win, self.color, False, self.orbit, 1)
+        pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)  
+    
 
 def main():
     running = True
     clock = pygame.time.Clock()
 
-    sun = Planet(0, 0, 50, YELLOW, 1.9882 * 10**30)
+    sun = Planet(0, 0, 30, YELLOW, 1.9882 * 10**30)
     sun.sun = True
 
     mercury = Planet(1 * 0.4*Planet.AU, 0, 6, LIGHT_GRAY, 3.3 * 10**23)
     mercury.y_vel = -47.4 * 1000
     
-    venus = Planet(1 * 0.72*Planet.AU, 0, 15, PALE_YELLOW, 4.8675 * 10**24)
+    venus = Planet(1 * 0.72*Planet.AU, 0, 13, PALE_YELLOW, 4.8675 * 10**24)
     venus.y_vel = -35.02 * 1000
 
     earth = Planet(-1 * Planet.AU, 0, 18, BLUE, 5.9742 * 10**24)
     earth.y_vel = 29.793 * 1000
+    earth.earth = True
 
     mars = Planet(-1 * 1.5*Planet.AU, 0, 9, RED, 6.4171 * 10**23)
     mars.y_vel = 24.077 * 1000
 
+    moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22)
+    moon.moon = True
 
     planets = [sun, mercury, venus, earth, mars]
 
@@ -114,6 +153,8 @@ def main():
         for planet in planets:
             planet.update_position(planets)
             planet.draw(WINDOW)
+
+        moon.draw(WINDOW, earth)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
