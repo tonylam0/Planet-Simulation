@@ -75,7 +75,7 @@ class Planet:
                 continue
             fx, fy = self.attraction(planet)
             total_fx += fx
-            total_fy += fy 
+            total_fy += fy
         
         self.x_vel += total_fx / self.mass * Planet.TIMESTEP  # derives from Newton's law of motion
         self.y_vel += total_fy / self.mass * Planet.TIMESTEP
