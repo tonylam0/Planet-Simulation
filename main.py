@@ -32,6 +32,7 @@ class Planet:
         self.mass = mass  # in kilograms
         self.curr_x = 0
         self.curr_y = 0
+        self.initial_y = y
 
         self.orbit = []
         self.sun = False
@@ -45,13 +46,6 @@ class Planet:
     def draw(self, win):
         self.curr_x = self.x * Planet.SCALE + WIDTH / 2  # adjusts planet position from the center of the screen
         self.curr_y = self.y * Planet.SCALE + HEIGHT / 2
-
-        if self.earth:
-            print(f"earthx: {self.curr_x}")
-            print(f"earthy: {self.curr_y}") 
-        elif self.moon:
-            print(f"moonx: {x}")
-            print(f"moony: {y}") 
 
         if len(self.orbit) > 2:
             updated_points = []
@@ -102,22 +96,20 @@ class Moon(Planet):
         self.angle = 0
 
     def draw(self, win, planet):
-        self.angle -= .069
+        self.angle -= .1
         self.x = planet.curr_x + (25 * math.cos(self.angle)) # adjusts moon's position based on planet
         self.y = planet.curr_y + (25 * math.sin(self.angle))
 
         self.orbit.append((self.x, self.y)) # if you want to draw the orbit of the moon
 
-        if self.earth:
-            print(f"earthx: {x}")
-            print(f"earthy: {y}") 
-        elif self.moon:
-            print(f"moonx: {self.x}")
-            print(f"moony: {self.y}") 
-
         if len(self.orbit) > 2:
             pygame.draw.lines(win, self.color, False, self.orbit, 1)
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)  
+
+    def track_moon(self, planet):
+        initial_planet_position_y = planet.initial_y
+        for angle in range(0, 0.1, 0.001):
+            simulate_x = self.x = planet.curr_x + (25 * math.cos(angle))
     
 
 def main():
