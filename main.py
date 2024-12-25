@@ -100,11 +100,10 @@ class Moon(Planet):
         super().__init__(x, y, radius, color, mass)
         self.orbit = []
         self.angle = 0
-        self.speed = .01
 
     def draw(self, win, planet):
         self.angle -= .069
-        self.x = planet.curr_x + (25 * math.cos(self.angle)) # adjusts planet position from the center of the screen
+        self.x = planet.curr_x + (25 * math.cos(self.angle)) # adjusts moon's position based on planet
         self.y = planet.curr_y + (25 * math.sin(self.angle))
 
         self.orbit.append((self.x, self.y)) # if you want to draw the orbit of the moon
