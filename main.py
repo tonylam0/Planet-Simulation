@@ -96,7 +96,7 @@ class Moon(Planet):
         self.angle = 0
 
     def draw(self, win, planet):
-        self.angle -= .1
+        self.angle -= .069
         self.x = planet.curr_x + (25 * math.cos(self.angle)) # adjusts moon's position based on planet
         self.y = planet.curr_y + (25 * math.sin(self.angle))
 
