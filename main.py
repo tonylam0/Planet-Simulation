@@ -1,6 +1,5 @@
 import pygame
 import math
-import numpy as np
 
 pygame.init()
 
@@ -59,7 +58,8 @@ class Planet:
         GLOW_SURFACE = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 
         if self.sun:
-            for i in range(0, self.radius + 1): # Glow added through applying multiple smaller but more opaque circles on top of each other
+            # Glow effect: applying multiple smaller but more opaque circles on top of each other
+            for i in range(0, self.radius + 1):
                 fade = int(255 * (i / self.radius)) # Opacity starts off small
                 pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.curr_x, self.curr_y), 2 * self.radius - i) # Radius starts off large
 
@@ -109,15 +109,11 @@ class Moon(Planet):
         self.x = planet.curr_x + (25 * math.cos(self.angle)) # adjusts moon's position based on planet
         self.y = planet.curr_y + (25 * math.sin(self.angle))
 
-        # self.orbit.append((self.x, self.y)) # if you want to draw the orbit of the moon
+        # self.orbit.append((self.x, self.y)) # Uncomment if you want to draw the orbit of the moon
 
         if len(self.orbit) > 2:
             pygame.draw.lines(win, self.color, False, self.orbit, 1)
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
-
-class Glow:
-    def __init__(self):
-        pass
 
 def main():
     running = True
