@@ -58,12 +58,13 @@ class Planet:
         
         GLOW_SURFACE = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 
-        for i in range(0, self.radius + 1):
-            fade = int(255 * (i / self.radius))
-            pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.curr_x, self.curr_y), 2 * self.radius - i) # add glow
+        if self.sun:
+            for i in range(0, self.radius + 1): # Glow added through applying multiple smaller but more opaque circles on top of each other
+                fade = int(255 * (i / self.radius)) # Opacity starts off small
+                pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.curr_x, self.curr_y), 2 * self.radius - i) # Radius starts off large
 
-        WINDOW.blit(GLOW_SURFACE, (0,0))
-        
+            WINDOW.blit(GLOW_SURFACE, (0,0))
+            
         pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius) 
 
     def attraction(self, other):  # calculate Newton's law of universal gravitation 
