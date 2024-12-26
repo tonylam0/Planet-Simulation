@@ -142,10 +142,10 @@ def main():
     moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22, .069, earth, 30, 0)
     moon.moon = True
 
-    phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, LIGHT_GRAY, 1.060 * 10**16, .05175, mars, 13, 0)
+    phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, LIGHT_GRAY, 1.060 * 10**16, .069, mars, 13, 0)
     phobos.moon = True
 
-    deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, REDDISH_GRAY, 1.5 * 10**15, .069, mars, 20, 5)
+    deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, REDDISH_GRAY, 1.5 * 10**15, .05175, mars, 20, 5)
 
     planets = [sun, mercury, venus, earth, mars]
     moons = [moon, phobos, deimos]
