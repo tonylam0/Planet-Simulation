@@ -15,6 +15,7 @@ PALE_YELLOW = (255, 233, 186)
 BLUE = (0, 102, 204)
 RED = (188, 39, 50)
 OFF_WHITE = (190, 190, 190)
+REDDISH_GRAY = (150, 100, 100)
 
 
 class Planet:
@@ -99,15 +100,18 @@ class Planet:
         self.orbit.append((self.x, self.y))  # collection of positions to represent orbit path
 
 class Moon(Planet):
-    def __init__(self, x, y, radius, color, mass):
+    def __init__(self, x, y, radius, color, mass, orbit_speed, planet, distance_to_planet, angle):
         super().__init__(x, y, radius, color, mass)
         self.orbit = []
-        self.angle = 0
+        self.angle = angle
+        self.orbit_speed = orbit_speed
+        self.planet = planet
+        self.distance_to_planet = distance_to_planet
 
     def draw(self, win, planet):
-        self.angle -= .069 # increasing value increases the speed of moon revolution
-        self.x = planet.curr_x + (25 * math.cos(self.angle)) # adjusts moon's position based on planet
-        self.y = planet.curr_y + (25 * math.sin(self.angle))
+        self.angle -= self.orbit_speed # increasing value increases the speed of moon revolution
+        self.x = planet.curr_x + (self.distance_to_planet * math.cos(self.angle)) # adjusts moon's position based on planet
+        self.y = planet.curr_y + (self.distance_to_planet * math.sin(self.angle))
 
         # self.orbit.append((self.x, self.y)) # Uncomment if you want to draw the orbit of the moon
 
@@ -135,10 +139,16 @@ def main():
     mars = Planet(-1 * 1.5*Planet.AU, 0, 9, RED, 6.4171 * 10**23)
     mars.y_vel = 24.077 * 1000
 
-    moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22)
+    moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22, .069, earth, 30, 0)
     moon.moon = True
 
+    phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, LIGHT_GRAY, 1.060 * 10**16, .05175, mars, 13, 0)
+    phobos.moon = True
+
+    deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, REDDISH_GRAY, 1.5 * 10**15, .069, mars, 20, 5)
+
     planets = [sun, mercury, venus, earth, mars]
+    moons = [moon, phobos, deimos]
 
     while running:
         clock.tick(60)
@@ -148,7 +158,8 @@ def main():
             planet.update_position(planets)
             planet.draw(WINDOW)
 
-        moon.draw(WINDOW, earth)
+        for satellite in moons:
+            satellite.draw(WINDOW, satellite.planet)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
