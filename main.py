@@ -1,5 +1,6 @@
 import pygame
 import math
+import numpy as np
 
 pygame.init()
 
@@ -23,7 +24,6 @@ class Planet:
     SCALE = 250 / AU  # 1 AU = 100 pixels
     TIMESTEP = 3600*24  # 1 day elapsed
 
-
     def __init__(self, x, y, radius, color, mass):
         self.x = x
         self.y = y
@@ -32,7 +32,6 @@ class Planet:
         self.mass = mass  # in kilograms
         self.curr_x = 0
         self.curr_y = 0
-        self.initial_y = y
 
         self.orbit = []
         self.sun = False
@@ -105,12 +104,6 @@ class Moon(Planet):
         if len(self.orbit) > 2:
             pygame.draw.lines(win, self.color, False, self.orbit, 1)
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)  
-
-    def track_moon(self, planet):
-        initial_planet_position_y = planet.initial_y
-        for angle in range(0, 0.1, 0.001):
-            simulate_x = self.x = planet.curr_x + (25 * math.cos(angle))
-    
 
 def main():
     running = True
