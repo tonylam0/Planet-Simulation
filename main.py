@@ -55,9 +55,18 @@ class Planet:
                 updated_points.append((x, y))
             
             pygame.draw.lines(win, self.color, False, updated_points, 1)
+        
+        GLOW_SURFACE = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+
+        for i in range(0, self.radius + 1):
+            fade = int(255 * (i / self.radius))
+            pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.curr_x, self.curr_y), 2 * self.radius - i) # add glow
+
+        WINDOW.blit(GLOW_SURFACE, (0,0))
+        
         pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius) 
 
-    def attraction(self, other):  # calculate Newton's law of universal gravition 
+    def attraction(self, other):  # calculate Newton's law of universal gravitation 
         other_x, other_y = other.x, other.y
         distance_x = other_x - self.x  # represents r in newton's equation
         distance_y = other_y - self.y
@@ -95,21 +104,25 @@ class Moon(Planet):
         self.angle = 0
 
     def draw(self, win, planet):
-        self.angle -= .069
+        self.angle -= .069 # increasing value increases the speed of moon revolution
         self.x = planet.curr_x + (25 * math.cos(self.angle)) # adjusts moon's position based on planet
         self.y = planet.curr_y + (25 * math.sin(self.angle))
 
-        self.orbit.append((self.x, self.y)) # if you want to draw the orbit of the moon
+        # self.orbit.append((self.x, self.y)) # if you want to draw the orbit of the moon
 
         if len(self.orbit) > 2:
             pygame.draw.lines(win, self.color, False, self.orbit, 1)
-        pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)  
+        pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
+
+class Glow:
+    def __init__(self):
+        pass
 
 def main():
     running = True
     clock = pygame.time.Clock()
 
-    sun = Planet(0, 0, 30, YELLOW, 1.9882 * 10**30)
+    sun = Planet(0, 0, 50, YELLOW, 1.9882 * 10**30)
     sun.sun = True
 
     mercury = Planet(1 * 0.4*Planet.AU, 0, 6, LIGHT_GRAY, 3.3 * 10**23)
