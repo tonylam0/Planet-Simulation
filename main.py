@@ -164,7 +164,7 @@ def main():
     running = True
     clock = pygame.time.Clock()
 
-    sun = Planet(0, 0, 50, YELLOW, 1.9882 * 10**30, 365, sprites.sun_sprites, True)
+    sun = Planet(0, 0, 100, YELLOW, 1.9882 * 10**30, 365, sprites.sun_sprites, True)
     sun.sun = True
 
     mercury = Planet(1 * 0.4*Planet.AU, 0, 6, LIGHT_GRAY, 3.3 * 10**2, 88, sprites.mercury_sprites, False)
