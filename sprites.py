@@ -1,5 +1,16 @@
 import pygame
 
+sun_sprites = [
+    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp1.png"), 
+    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp2.png"), 
+    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp3.png"), 
+    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp4.png"), 
+    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp4.png"), 
+    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp5.png"), 
+    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp6.png"), 
+    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp7.png"), 
+]
+
 earth_sprites = [
     pygame.image.load("./Planet Skins/Earth Sprites/earth_sp1.png"), 
     pygame.image.load("./Planet Skins/Earth Sprites/earth_sp2.png"), 
@@ -32,3 +43,88 @@ earth_sprites = [
     pygame.image.load("./Planet Skins/Earth Sprites/earth_sp29.png"), 
     pygame.image.load("./Planet Skins/Earth Sprites/earth_sp30.png"),
 ]
+
+mercury_sprites = [ # Have to flip mercury sprite because intial x position is flipped
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp1.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp2.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp3.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp4.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp5.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp6.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp7.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp8.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp9.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp10.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp11.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp12.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp13.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp14.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp15.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp16.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp17.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp18.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp19.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp20.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp21.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp22.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp23.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp24.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp25.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp26.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp27.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp28.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp29.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Mercury Sprites/mercury_sp30.png"), True, True)
+]
+
+venus_sprites = [ # Have to flip venus sprite because intial x position is flipped
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp1.png"), True, True), 
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp2.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp3.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp4.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp5.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp6.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp7.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp8.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp9.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp10.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp11.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp12.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp13.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp14.png"), True, True),
+    pygame.transform.flip(pygame.image.load("./Planet Skins/Venus Sprites/venus_sp15.png"), True, True)
+]
+
+mars_sprites = [
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp1.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp2.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp3.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp4.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp5.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp6.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp7.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp8.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp9.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp10.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp11.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp12.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp13.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp14.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp15.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp16.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp17.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp18.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp19.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp20.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp21.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp22.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp23.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp24.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp25.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp26.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp27.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp28.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp29.png"), 
+    pygame.image.load("./Planet Skins/Mars Sprites/mars_sp30.png")
+]
+

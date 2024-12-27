@@ -20,17 +20,17 @@ REDDISH_GRAY = (150, 100, 100)
 
 
 class Planet(pygame.sprite.Sprite):
-    AU = 149.6e6 * 1000  # average distance from Earth to the Sun in meters
-    G = 6.67428e-11  # graviational constant = calculates gravitional force
+    AU = 149.6e6 * 1000  # Average distance from Earth to the Sun in meters
+    G = 6.67428e-11  # Graviational constant = calculates gravitional force
     SCALE = 250 / AU  # 1 AU = 100 pixels
     TIMESTEP = 3600*24  # 1 day elapsed
 
-    def __init__(self, x, y, radius, color, mass, year_to_days, sprite):
+    def __init__(self, x, y, radius, color, mass, year_to_days, sprite, revolution):
         self.x = x
         self.y = y
         self.radius = radius
         self.color = color
-        self.mass = mass  # in kilograms
+        self.mass = mass  # In kilograms
         self.curr_x = 0
         self.curr_y = 0
 
@@ -47,9 +47,11 @@ class Planet(pygame.sprite.Sprite):
         self.current_sprite = 0
         self.angle = 0
         self.year_to_days = year_to_days
+        self.revolution = revolution  # Shows whether initial x coordinate was flipped or not
+        self.revolution_flag = False
 
     def draw(self, win):
-        self.curr_x = self.x * Planet.SCALE + WIDTH / 2  # adjusts planet position from the center of the screen
+        self.curr_x = self.x * Planet.SCALE + WIDTH / 2  # Adjusts planet position from the center of the screen
         self.curr_y = self.y * Planet.SCALE + HEIGHT / 2
 
         if len(self.orbit) > 2:
@@ -67,33 +69,42 @@ class Planet(pygame.sprite.Sprite):
         if self.sun:
             # Glow effect: applying multiple smaller but more opaque circles on top of each other
             for i in range(0, self.radius + 1):
-                fade = int(255 * (i / self.radius)) # Opacity starts off small
-                pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.curr_x, self.curr_y), 2 * self.radius - i) # Radius starts off large
+                fade = int(50 * (i / self.radius))  # Opacity starts off small
+                pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.curr_x, self.curr_y), 1.05 * self.radius - i)  # Radius starts off large
 
             WINDOW.blit(GLOW_SURFACE, (0,0))
 
-        if self.earth:
-            self.current_sprite += .5 # Days in a year / 50 (# of sprites) = canonically accurate model
-            self.angle += 360 / self.year_to_days # degree per simulated day
+        # Gives an index & when index hits length of sprites list, index resets
+        self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
+        self.angle += 360 / self.year_to_days  # Degree per simulated day
 
-            if self.current_sprite >= len(self.sprites):
-                self.current_sprite = 0
-
-            if int(self.angle) == 360:
+        # Used to calculate planet quadrant
+        cross_horizon_x = WIDTH - self.curr_x
+        cross_horizon_y = HEIGHT - self.curr_y
+        
+        # Based on which quadrant planet is in, the angle will reset
+        if self.revolution:
+            if cross_horizon_x > WIDTH / 2 and cross_horizon_y > HEIGHT / 2: 
+                self.revolution_flag = True
+            if self.revolution_flag and cross_horizon_y < HEIGHT / 2:
                 self.angle = 0
-
-            earth_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2*self.radius, 2*self.radius))
-            earth_sprite = pygame.transform.rotate(earth_sprite, int(self.angle))
-            draw_at_center(WINDOW, earth_sprite, self.curr_x, self.curr_y)
-
+                self.revolution_flag = False
         else:
-            pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius) # code in place before adding sprite code
+            if cross_horizon_x < WIDTH / 2 and cross_horizon_y < HEIGHT / 2:
+                self.revolution_flag = True
+            if self.revolution_flag and cross_horizon_y > HEIGHT / 2:
+                self.angle = 0
+                self.revolution_flag = False
 
-    def attraction(self, other):  # calculate Newton's law of universal gravitation 
+        planet_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2*self.radius, 2*self.radius))
+        planet_sprite = pygame.transform.rotate(planet_sprite, int(self.angle))
+        draw_at_center(WINDOW, planet_sprite, self.curr_x, self.curr_y)
+
+    def attraction(self, other):  # Calculate Newton's law of universal gravitation 
         other_x, other_y = other.x, other.y
-        distance_x = other_x - self.x  # represents r in newton's equation
+        distance_x = other_x - self.x  # Represents r in newton's equation
         distance_y = other_y - self.y
-        radius = math.sqrt(distance_x**2 + distance_y**2)  # can exclude the sqrt because the equation requires r^2 anyways
+        radius = math.sqrt(distance_x**2 + distance_y**2)  # Can exclude the sqrt because the equation requires r^2 anyways
 
         if other.sun:
             self.distance_to_sun = radius
@@ -113,19 +124,20 @@ class Planet(pygame.sprite.Sprite):
             total_fx += fx
             total_fy += fy
 
-        self.x_vel += total_fx / self.mass * Planet.TIMESTEP  # derives from Newton's law of motion
+        self.x_vel += total_fx / self.mass * Planet.TIMESTEP  # Derives from Newton's law of motion
         self.y_vel += total_fy / self.mass * Planet.TIMESTEP
 
-        self.x += self.x_vel * Planet.TIMESTEP  # current position + displacement
+        self.x += self.x_vel * Planet.TIMESTEP  # Current position + displacement
         self.y += self.y_vel * Planet.TIMESTEP
-        self.orbit.append((self.x, self.y))  # collection of positions to represent orbit path
+        self.orbit.append((self.x, self.y))  # Collection of positions to represent orbit path
 
-    def draw_to_sun(self, body_two): # draws line from planet to sun
-        pygame.draw.line(WINDOW, WHITE, (body_two.curr_x, body_two.curr_y), (self.curr_x, self.curr_y))
+    def draw_to_body(self, body): # Draws line from one body to another
+        pygame.draw.line(WINDOW, WHITE, (body.curr_x, body.curr_y), (self.curr_x, self.curr_y))
+
 
 class Moon(Planet):
-    def __init__(self, x, y, radius, color, mass, year_to_days, sprite, orbit_speed, planet, distance_to_planet, angle):
-        super().__init__(x, y, radius, color, mass, year_to_days, sprite)
+    def __init__(self, x, y, radius, color, mass, year_to_days, sprite, revolution, orbit_speed, planet, distance_to_planet, angle):
+        super().__init__(x, y, radius, color, mass, year_to_days, sprite, revolution)
         self.orbit = []
         self.angle = angle
         self.orbit_speed = orbit_speed
@@ -133,17 +145,18 @@ class Moon(Planet):
         self.distance_to_planet = distance_to_planet
 
     def draw(self, win, planet):
-        self.angle -= self.orbit_speed # increasing value increases the speed of moon revolution
-        self.x = planet.curr_x + (self.distance_to_planet * math.cos(self.angle)) # adjusts moon's position based on planet
-        self.y = planet.curr_y + (self.distance_to_planet * math.sin(self.angle))
+        self.angle -= self.orbit_speed # Increasing value increases the speed of moon revolution
+        self.curr_x = planet.curr_x + (self.distance_to_planet * math.cos(self.angle)) # Adjusts moon's position based on planet
+        self.curr_y = planet.curr_y + (self.distance_to_planet * math.sin(self.angle))
 
         # self.orbit.append((self.x, self.y)) # Uncomment if you want to draw the orbit of the moon
 
         if len(self.orbit) > 2:
             pygame.draw.lines(win, self.color, False, self.orbit, 1)
-        pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
+        pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius)
 
-def draw_at_center(win, image, x, y): # centers the image being placed on screen
+
+def draw_at_center(win, image, x, y): # Centers the image being placed on screen
     image_rect = image.get_rect(center=(x, y))
     win.blit(image, image_rect.topleft)
 
@@ -151,32 +164,32 @@ def main():
     running = True
     clock = pygame.time.Clock()
 
-    sun = Planet(0, 0, 50, YELLOW, 1.9882 * 10**30, None, None)
+    sun = Planet(0, 0, 50, YELLOW, 1.9882 * 10**30, 365, sprites.sun_sprites, True)
     sun.sun = True
 
-    mercury = Planet(1 * 0.4*Planet.AU, 0, 6, LIGHT_GRAY, 3.3 * 10**2, None, None)
+    mercury = Planet(1 * 0.4*Planet.AU, 0, 6, LIGHT_GRAY, 3.3 * 10**2, 88, sprites.mercury_sprites, False)
     mercury.y_vel = -47.4 * 1000
     
-    venus = Planet(1 * 0.72*Planet.AU, 0, 13, PALE_YELLOW, 4.8675 * 10**24, None, None)
+    venus = Planet(1 * 0.72*Planet.AU, 0, 13, PALE_YELLOW, 4.8675 * 10**24, 225, sprites.venus_sprites, False)
     venus.y_vel = -35.02 * 1000
 
-    earth = Planet(-1 * Planet.AU, 0, 18, BLUE, 5.9742 * 10**24, 365.242374, sprites.earth_sprites)
+    earth = Planet(-1 * Planet.AU, 0, 18, BLUE, 5.9742 * 10**24, 365.242374, sprites.earth_sprites, True)
     earth.y_vel = 29.793 * 1000
     earth.earth = True
 
-    mars = Planet(-1 * 1.5*Planet.AU, 0, 9, RED, 6.4171 * 10**23, None, None)
+    mars = Planet(-1 * 1.5*Planet.AU, 0, 9, RED, 6.4171 * 10**23, 687, sprites.mars_sprites, True)
     mars.y_vel = 24.077 * 1000
 
-    moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22, None, None, .069, earth, 30, 0)
-    moon.moon = True
+    # moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22, None, None, .069, earth, 30, 0)
+    # moon.moon = True
 
-    phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, LIGHT_GRAY, 1.060 * 10**16, None, None, .069, mars, 13, 0)
-    phobos.moon = True
+    # phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, LIGHT_GRAY, 1.060 * 10**16, None, None, .069, mars, 13, 0)
+    # phobos.moon = True
 
-    deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, REDDISH_GRAY, 1.5 * 10**15, None, None, .05175, mars, 20, 5)
+    # deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, REDDISH_GRAY, 1.5 * 10**15, None, None, .05175, mars, 20, 5)
 
     planets = [sun, mercury, venus, earth, mars]
-    moons = [moon, phobos, deimos]
+    # moons = [moon, phobos, deimos]
 
     while running:
         clock.tick(60)
@@ -186,8 +199,8 @@ def main():
             planet.update_position(planets)
             planet.draw(WINDOW)
 
-        for satellite in moons:
-            satellite.draw(WINDOW, satellite.planet)
+        # for satellite in moons:
+            # satellite.draw(WINDOW, satellite.planet)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
