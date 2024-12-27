@@ -155,9 +155,34 @@ class Moon(Planet):
 
         # self.orbit.append((self.x, self.y)) # Uncomment if you want to draw the orbit of the moon
 
-        if len(self.orbit) > 2:
-            pygame.draw.lines(win, self.color, False, self.orbit, 1)
-        pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius)
+        # if len(self.orbit) > 2:
+        #     pygame.draw.lines(win, self.color, False, self.orbit, 1)
+        # pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius)
+
+        self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
+        self.angle += 360 / self.year_to_days  # Degree per simulated day
+
+        cross_horizon_x = WIDTH - self.curr_x
+        cross_horizon_y = HEIGHT - self.curr_y
+        
+        if self.revolution:
+            if cross_horizon_x > WIDTH / 2 and cross_horizon_y > HEIGHT / 2: 
+                self.opp_quadrant_flag = True
+            if self.opp_quadrant_flag and cross_horizon_y < HEIGHT / 2:
+                self.angle = 0
+                self.opp_quadrant_flag = False
+                self.revolution_complete = True
+        else:
+            if cross_horizon_x < WIDTH / 2 and cross_horizon_y < HEIGHT / 2:
+                self.opp_quadrant_flag = True
+            if self.opp_quadrant_flag and cross_horizon_y > HEIGHT / 2:
+                self.angle = 0
+                self.opp_quadrant_flag = False
+                self.revolution_complete = True
+
+        planet_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2*self.radius, 2*self.radius))
+        planet_sprite = pygame.transform.rotate(planet_sprite, int(self.angle))
+        draw_at_center(WINDOW, planet_sprite, self.curr_x, self.curr_y)
 
 
 def draw_at_center(win, image, x, y): # Centers the image being placed on screen
@@ -184,13 +209,13 @@ def main():
     mars = Planet(-1 * 1.5*Planet.AU, 0, 9, RED, 6.4171 * 10**23, 687, sprites.mars_sprites, True)
     mars.y_vel = 24.077 * 1000
 
-    moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22, None, None, None, .069, earth, 30, 0)
+    moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22, 300 * 4, sprites.mercury_sprites, True, .069, earth, 30, 0)
     moon.moon = True
 
-    phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, LIGHT_GRAY, 1.060 * 10**16, None, None, None, .069, mars, 13, 0)
+    phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, LIGHT_GRAY, 1.060 * 10**16, 500 * 4, sprites.phobos_sprites, True, .069, mars, 13, 0)
     phobos.moon = True
 
-    deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, REDDISH_GRAY, 1.5 * 10**15, None, None, None, .05175, mars, 20, 5)
+    deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, REDDISH_GRAY, 1.5 * 10**15, 500 * 4, sprites.deimos_sprites, True, .05175, mars, 20, 5)
 
     planets = [sun, mercury, venus, earth, mars]
     moons = [moon, phobos, deimos]
