@@ -161,7 +161,13 @@ class Moon(Planet):
 
         if len(self.orbit) > 2:
             pygame.draw.lines(win, self.color, False, self.orbit, 1)
-        pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius)
+
+        self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
+
+        moon_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2*self.radius, 2*self.radius))
+        draw_at_center(WINDOW, moon_sprite, self.curr_x, self.curr_y)
+
+        # pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius)
 
 
 def draw_at_center(win, image, x, y): # Centers the image being placed on screen

@@ -16,61 +16,27 @@ def flip_sprites(sprites):  # For the planets that have a flipped initial positi
         sprite_lst.append(curr_sprite)
     return sprite_lst
 
+sp_directory = "./Planet Sprites/"
+
 sun_sprites = [
-    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp1.png"), 
-    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp2.png"), 
-    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp3.png"), 
-    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp4.png"), 
-    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp4.png"), 
-    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp5.png"), 
-    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp6.png"), 
-    pygame.image.load("./Planet Skins/Sun Sprites/sun_sp7.png"), 
+    pygame.image.load(sp_directory + "Sun Sprites/sun_sp1.png"), 
+    pygame.image.load(sp_directory + "Sun Sprites/sun_sp2.png"), 
+    pygame.image.load(sp_directory + "Sun Sprites/sun_sp3.png"), 
+    pygame.image.load(sp_directory + "Sun Sprites/sun_sp4.png"), 
+    pygame.image.load(sp_directory + "Sun Sprites/sun_sp4.png"), 
+    pygame.image.load(sp_directory + "Sun Sprites/sun_sp5.png"), 
+    pygame.image.load(sp_directory + "Sun Sprites/sun_sp6.png"), 
+    pygame.image.load(sp_directory + "Sun Sprites/sun_sp7.png")
 ]
-
-sp_directory = "./Planet Skins/"
-
-earth_sprites = cut_spritesheet(pygame.image.load(sp_directory + "Earth Sprites.png"), 30)
 
 mercury_sprites = flip_sprites(cut_spritesheet(pygame.image.load(sp_directory + "Mercury Sprites.png"), 30))
 
 venus_sprites = flip_sprites(cut_spritesheet(pygame.image.load(sp_directory + "Venus Sprites.png"), 15))
 
+earth_sprites = cut_spritesheet(pygame.image.load(sp_directory + "Earth Sprites.png"), 30)
+
 mars_sprites = cut_spritesheet(pygame.image.load(sp_directory + "Mars Sprites.png"), 30)
     
-phobos_sprites = [
-    pygame.transform.scale(pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp1.png"), (50, 50)),
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp2.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp3.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp4.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp5.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp6.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp7.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp8.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp9.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp10.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp11.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp12.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp13.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp14.png"),    
-    pygame.image.load("./Planet Skins/Phobos Sprites/phobos_sp15.png")  
-]
+phobos_sprites = cut_spritesheet(pygame.image.load(sp_directory + "Phobos Sprites.png"), 15)
 
-deimos_sprites = [
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp1.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp2.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp3.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp4.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp5.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp6.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp7.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp8.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp9.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp10.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp11.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp12.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp13.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp14.png"),
-    pygame.image.load("./Planet Skins/Deimos Sprites/deimos_sp15.png"),
-]
-
-
+deimos_sprites = cut_spritesheet(pygame.image.load(sp_directory + "Deimos Sprites.png"), 15)
