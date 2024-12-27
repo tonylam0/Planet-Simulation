@@ -48,7 +48,8 @@ class Planet(pygame.sprite.Sprite):
         self.angle = 0
         self.year_to_days = year_to_days
         self.revolution = revolution  # Shows whether initial x coordinate was flipped or not
-        self.revolution_flag = False
+        self.opp_quadrant_flag = False  # Checks if planet has reached opposite planal quadrant
+        self.revolution_complete = False  # Checks if a revolution has been complete
 
     def draw(self, win):
         self.curr_x = self.x * Planet.SCALE + WIDTH / 2  # Adjusts planet position from the center of the screen
@@ -75,6 +76,7 @@ class Planet(pygame.sprite.Sprite):
             WINDOW.blit(GLOW_SURFACE, (0,0))
 
         # Gives an index & when index hits length of sprites list, index resets
+        # higher number value = higher rotation speed
         self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
         self.angle += 360 / self.year_to_days  # Degree per simulated day
 
@@ -82,19 +84,21 @@ class Planet(pygame.sprite.Sprite):
         cross_horizon_x = WIDTH - self.curr_x
         cross_horizon_y = HEIGHT - self.curr_y
         
-        # Based on which quadrant planet is in, the angle will reset
+        # Based on which quadrant the planet is in, the angle will reset
         if self.revolution:
             if cross_horizon_x > WIDTH / 2 and cross_horizon_y > HEIGHT / 2: 
-                self.revolution_flag = True
-            if self.revolution_flag and cross_horizon_y < HEIGHT / 2:
+                self.opp_quadrant_flag = True
+            if self.opp_quadrant_flag and cross_horizon_y < HEIGHT / 2:
                 self.angle = 0
-                self.revolution_flag = False
+                self.opp_quadrant_flag = False
+                self.revolution_complete = True
         else:
             if cross_horizon_x < WIDTH / 2 and cross_horizon_y < HEIGHT / 2:
-                self.revolution_flag = True
-            if self.revolution_flag and cross_horizon_y > HEIGHT / 2:
+                self.opp_quadrant_flag = True
+            if self.opp_quadrant_flag and cross_horizon_y > HEIGHT / 2:
                 self.angle = 0
-                self.revolution_flag = False
+                self.opp_quadrant_flag = False
+                self.revolution_complete = True
 
         planet_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2*self.radius, 2*self.radius))
         planet_sprite = pygame.transform.rotate(planet_sprite, int(self.angle))
@@ -129,6 +133,8 @@ class Planet(pygame.sprite.Sprite):
 
         self.x += self.x_vel * Planet.TIMESTEP  # Current position + displacement
         self.y += self.y_vel * Planet.TIMESTEP
+        if self.revolution_complete:
+            self.orbit.pop(0)
         self.orbit.append((self.x, self.y))  # Collection of positions to represent orbit path
 
     def draw_to_body(self, body): # Draws line from one body to another
@@ -167,7 +173,7 @@ def main():
     sun = Planet(0, 0, 100, YELLOW, 1.9882 * 10**30, 365, sprites.sun_sprites, True)
     sun.sun = True
 
-    mercury = Planet(1 * 0.4*Planet.AU, 0, 6, LIGHT_GRAY, 3.3 * 10**2, 88, sprites.mercury_sprites, False)
+    mercury = Planet(1 * 0.4*Planet.AU, 0, 6, LIGHT_GRAY, 3.3 * 10**2, 87.969, sprites.mercury_sprites, False)
     mercury.y_vel = -47.4 * 1000
     
     venus = Planet(1 * 0.72*Planet.AU, 0, 13, PALE_YELLOW, 4.8675 * 10**24, 225, sprites.venus_sprites, False)
