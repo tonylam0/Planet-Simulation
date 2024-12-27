@@ -54,6 +54,14 @@ class Planet(pygame.sprite.Sprite):
     def draw(self, win):
         self.curr_x = self.x * Planet.SCALE + WIDTH / 2  # Adjusts planet position from the center of the screen
         self.curr_y = self.y * Planet.SCALE + HEIGHT / 2
+        
+        GLOW_SURFACE = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        if self.sun:
+            # Glow effect: applying multiple smaller but more opaque circles on top of each other
+            for i in range(0, self.radius + 1):
+                fade = int(50 * (i / self.radius))  # Opacity starts off small
+                pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.curr_x, self.curr_y), 1.05 * self.radius - i)  # Radius starts off large
+            WINDOW.blit(GLOW_SURFACE, (0,0))
 
         if len(self.orbit) > 2:
             updated_points = []
@@ -64,16 +72,6 @@ class Planet(pygame.sprite.Sprite):
                 updated_points.append((x, y))
             
             pygame.draw.lines(win, self.color, False, updated_points, 1)
-        
-        GLOW_SURFACE = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-
-        if self.sun:
-            # Glow effect: applying multiple smaller but more opaque circles on top of each other
-            for i in range(0, self.radius + 1):
-                fade = int(50 * (i / self.radius))  # Opacity starts off small
-                pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.curr_x, self.curr_y), 1.05 * self.radius - i)  # Radius starts off large
-
-            WINDOW.blit(GLOW_SURFACE, (0,0))
 
         # Gives an index & when index hits length of sprites list, index resets
         # higher number value = higher rotation speed
@@ -186,16 +184,16 @@ def main():
     mars = Planet(-1 * 1.5*Planet.AU, 0, 9, RED, 6.4171 * 10**23, 687, sprites.mars_sprites, True)
     mars.y_vel = 24.077 * 1000
 
-    # moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22, None, None, .069, earth, 30, 0)
-    # moon.moon = True
+    moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22, None, None, None, .069, earth, 30, 0)
+    moon.moon = True
 
-    # phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, LIGHT_GRAY, 1.060 * 10**16, None, None, .069, mars, 13, 0)
-    # phobos.moon = True
+    phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, LIGHT_GRAY, 1.060 * 10**16, None, None, None, .069, mars, 13, 0)
+    phobos.moon = True
 
-    # deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, REDDISH_GRAY, 1.5 * 10**15, None, None, .05175, mars, 20, 5)
+    deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, REDDISH_GRAY, 1.5 * 10**15, None, None, None, .05175, mars, 20, 5)
 
     planets = [sun, mercury, venus, earth, mars]
-    # moons = [moon, phobos, deimos]
+    moons = [moon, phobos, deimos]
 
     while running:
         clock.tick(60)
@@ -205,8 +203,8 @@ def main():
             planet.update_position(planets)
             planet.draw(WINDOW)
 
-        # for satellite in moons:
-            # satellite.draw(WINDOW, satellite.planet)
+        for satellite in moons:
+            satellite.draw(WINDOW, satellite.planet)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
