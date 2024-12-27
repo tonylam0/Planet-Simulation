@@ -159,30 +159,9 @@ class Moon(Planet):
         #     pygame.draw.lines(win, self.color, False, self.orbit, 1)
         # pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius)
 
-        self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
-        self.angle += 360 / self.year_to_days  # Degree per simulated day
-
-        cross_horizon_x = WIDTH - self.curr_x
-        cross_horizon_y = HEIGHT - self.curr_y
-        
-        if self.revolution:
-            if cross_horizon_x > WIDTH / 2 and cross_horizon_y > HEIGHT / 2: 
-                self.opp_quadrant_flag = True
-            if self.opp_quadrant_flag and cross_horizon_y < HEIGHT / 2:
-                self.angle = 0
-                self.opp_quadrant_flag = False
-                self.revolution_complete = True
-        else:
-            if cross_horizon_x < WIDTH / 2 and cross_horizon_y < HEIGHT / 2:
-                self.opp_quadrant_flag = True
-            if self.opp_quadrant_flag and cross_horizon_y > HEIGHT / 2:
-                self.angle = 0
-                self.opp_quadrant_flag = False
-                self.revolution_complete = True
-
-        planet_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2*self.radius, 2*self.radius))
-        planet_sprite = pygame.transform.rotate(planet_sprite, int(self.angle))
-        draw_at_center(WINDOW, planet_sprite, self.curr_x, self.curr_y)
+        if len(self.orbit) > 2:
+            pygame.draw.lines(win, self.color, False, self.orbit, 1)
+        pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius)
 
 
 def draw_at_center(win, image, x, y): # Centers the image being placed on screen
