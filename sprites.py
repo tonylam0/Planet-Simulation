@@ -35,6 +35,8 @@ venus_sprites = flip_sprites(cut_spritesheet(pygame.image.load(sp_directory + "V
 
 earth_sprites = cut_spritesheet(pygame.image.load(sp_directory + "Earth Sprites.png"), 30)
 
+moon_sprites = cut_spritesheet(pygame.image.load(sp_directory + "Mercury Sprites.png"), 30)
+
 mars_sprites = cut_spritesheet(pygame.image.load(sp_directory + "Mars Sprites.png"), 30)
     
 phobos_sprites = cut_spritesheet(pygame.image.load(sp_directory + "Phobos Sprites.png"), 15)

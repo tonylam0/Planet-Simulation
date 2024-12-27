@@ -153,21 +153,17 @@ class Moon(Planet):
         self.curr_x = planet.curr_x + (self.distance_to_planet * math.cos(self.angle)) # Adjusts moon's position based on planet
         self.curr_y = planet.curr_y + (self.distance_to_planet * math.sin(self.angle))
 
-        # self.orbit.append((self.x, self.y)) # Uncomment if you want to draw the orbit of the moon
-
+        # self.orbit.append((self.curr_x, self.curr_y)) # Uncomment if you want to draw the orbit of the moon
         # if len(self.orbit) > 2:
         #     pygame.draw.lines(win, self.color, False, self.orbit, 1)
-        # pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius)
 
         if len(self.orbit) > 2:
             pygame.draw.lines(win, self.color, False, self.orbit, 1)
 
         self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
-
         moon_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2*self.radius, 2*self.radius))
+        moon_sprite = pygame.transform.rotate(moon_sprite, int(self.planet.angle))
         draw_at_center(WINDOW, moon_sprite, self.curr_x, self.curr_y)
-
-        # pygame.draw.circle(win, self.color, (self.curr_x, self.curr_y), self.radius)
 
 
 def draw_at_center(win, image, x, y): # Centers the image being placed on screen
@@ -194,7 +190,7 @@ def main():
     mars = Planet(-1 * 1.5*Planet.AU, 0, 9, RED, 6.4171 * 10**23, 687, sprites.mars_sprites, True)
     mars.y_vel = 24.077 * 1000
 
-    moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22, 300 * 4, sprites.mercury_sprites, True, .069, earth, 30, 0)
+    moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22, 300 * 4, sprites.moon_sprites, True, .069, earth, 30, 0)
     moon.moon = True
 
     phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, LIGHT_GRAY, 1.060 * 10**16, 500 * 4, sprites.phobos_sprites, True, .069, mars, 13, 0)
