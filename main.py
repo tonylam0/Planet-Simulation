@@ -1,9 +1,10 @@
 import pygame
 import bodies
+import shared_resources as sr
 
 pygame.init()
 
-WINDOW = pygame.display.set_mode((bodies.WIDTH, bodies.HEIGHT))
+WINDOW = pygame.display.set_mode((sr.WIDTH, sr.HEIGHT))
 pygame.display.set_caption("The Planetary System")
 
 def main():

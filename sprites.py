@@ -17,7 +17,7 @@ def flip_sprites(sprites):  # For the planets that have a flipped initial positi
         sprite_lst.append(curr_sprite)
     return sprite_lst
 
-def resize_sprites(sprite_lst, planet_radius):
+def resize_sprites(sprite_lst, planet_radius):  # Resizes sprites to fit planet size
     new_sprite_lst = []
     for sprite in sprite_lst:
         sprite = pygame.transform.scale(sprite, (2*planet_radius, 2*planet_radius))
@@ -36,16 +36,23 @@ sun_sprites = resize_sprites([
     pygame.image.load(sp_directory + "Sun Sprites/sun_sp6.png"), 
     pygame.image.load(sp_directory + "Sun Sprites/sun_sp7.png")], sr.sun_radius)
 
-mercury_sprites = flip_sprites(resize_sprites(cut_spritesheet(pygame.image.load(sp_directory + "Mercury Sprites.png"), 30), sr.mercury_radius))
+mercury_sprites = flip_sprites(resize_sprites(cut_spritesheet(
+    pygame.image.load(sp_directory + "Mercury Sprites.png"), 30), sr.mercury_radius))
 
-venus_sprites = flip_sprites(resize_sprites(cut_spritesheet(pygame.image.load(sp_directory + "Venus Sprites.png"), 15), sr.venus_radius))
+venus_sprites = flip_sprites(resize_sprites(cut_spritesheet(
+    pygame.image.load(sp_directory + "Venus Sprites.png"), 15), sr.venus_radius))
 
-earth_sprites = resize_sprites(cut_spritesheet(pygame.image.load(sp_directory + "Earth Sprites.png"), 30), sr.earth_radius)
+earth_sprites = resize_sprites(cut_spritesheet(
+    pygame.image.load(sp_directory + "Earth Sprites.png"), 30), sr.earth_radius)
 
-moon_sprites = resize_sprites(cut_spritesheet(pygame.image.load(sp_directory + "Mercury Sprites.png"), 30), sr.moon_radius)
+moon_sprites = resize_sprites(cut_spritesheet(
+    pygame.image.load(sp_directory + "Mercury Sprites.png"), 30), sr.moon_radius)
 
-mars_sprites = resize_sprites(cut_spritesheet(pygame.image.load(sp_directory + "Mars Sprites.png"), 30), sr.mars_radius)
+mars_sprites = resize_sprites(cut_spritesheet(
+    pygame.image.load(sp_directory + "Mars Sprites.png"), 30), sr.mars_radius)
     
-phobos_sprites = resize_sprites(cut_spritesheet(pygame.image.load(sp_directory + "Phobos Sprites.png"), 15), sr.phobos_radius)
+phobos_sprites = resize_sprites(cut_spritesheet(
+    pygame.image.load(sp_directory + "Phobos Sprites.png"), 15), sr.phobos_radius)
 
-deimos_sprites = resize_sprites(cut_spritesheet(pygame.image.load(sp_directory + "Deimos Sprites.png"), 15), sr.deimos_radius)
+deimos_sprites = resize_sprites(cut_spritesheet(
+    pygame.image.load(sp_directory + "Deimos Sprites.png"), 15), sr.deimos_radius)

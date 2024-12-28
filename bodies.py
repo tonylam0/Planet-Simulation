@@ -3,9 +3,6 @@ import math
 import sprites
 import shared_resources as sr
 
-WIDTH, HEIGHT = 800, 800
-
-# colors
 WHITE = (255, 255, 255)
 YELLOW = (249, 215, 28)
 LIGHT_GRAY = (169, 169, 169)
@@ -48,10 +45,11 @@ class Planet(pygame.sprite.Sprite):
         self.revolution_complete = False  # Checks if a revolution has been complete
 
     def draw(self, win):
-        self.curr_x = self.x * Planet.SCALE + WIDTH / 2  # Adjusts planet position from the center of the screen
-        self.curr_y = self.y * Planet.SCALE + HEIGHT / 2
+        # Adjusts planet size & position to fit screen from the center
+        self.curr_x = self.x * Planet.SCALE + sr.WIDTH / 2
+        self.curr_y = self.y * Planet.SCALE + sr.HEIGHT / 2
         
-        GLOW_SURFACE = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        GLOW_SURFACE = pygame.Surface((sr.WIDTH, sr.HEIGHT), pygame.SRCALPHA)
         if self.sun:
             # Glow effect: applying multiple smaller but more opaque circles on top of each other
             for i in range(0, self.radius + 1):
@@ -63,8 +61,8 @@ class Planet(pygame.sprite.Sprite):
             updated_points = []
             for point in self.orbit:
                 x, y = point
-                x = x * self.SCALE + WIDTH / 2
-                y = y * self.SCALE + HEIGHT / 2
+                x = x * self.SCALE + sr.WIDTH / 2
+                y = y * self.SCALE + sr.HEIGHT / 2
                 updated_points.append((x, y))
             
             pygame.draw.lines(win, self.color, False, updated_points, 1)
@@ -75,21 +73,21 @@ class Planet(pygame.sprite.Sprite):
         self.angle += 360 / self.year_to_days  # Degree per simulated day
 
         # Used to calculate planet quadrant
-        cross_horizon_x = WIDTH - self.curr_x
-        cross_horizon_y = HEIGHT - self.curr_y
+        cross_horizon_x = sr.WIDTH - self.curr_x
+        cross_horizon_y = sr.HEIGHT - self.curr_y
         
         # Based on which quadrant the planet is in, the angle will reset
         if self.revolution:
-            if cross_horizon_x > WIDTH / 2 and cross_horizon_y > HEIGHT / 2: 
+            if cross_horizon_x > sr.WIDTH / 2 and cross_horizon_y > sr.HEIGHT / 2: 
                 self.opp_quadrant_flag = True
-            if self.opp_quadrant_flag and cross_horizon_y < HEIGHT / 2:
+            if self.opp_quadrant_flag and cross_horizon_y < sr.HEIGHT / 2:
                 self.angle = 0
                 self.opp_quadrant_flag = False
                 self.revolution_complete = True
         else:
-            if cross_horizon_x < WIDTH / 2 and cross_horizon_y < HEIGHT / 2:
+            if cross_horizon_x < sr.WIDTH / 2 and cross_horizon_y < sr.HEIGHT / 2:
                 self.opp_quadrant_flag = True
-            if self.opp_quadrant_flag and cross_horizon_y > HEIGHT / 2:
+            if self.opp_quadrant_flag and cross_horizon_y > sr.HEIGHT / 2:
                 self.angle = 0
                 self.opp_quadrant_flag = False
                 self.revolution_complete = True
@@ -126,11 +124,12 @@ class Planet(pygame.sprite.Sprite):
 
         self.x += self.x_vel * Planet.TIMESTEP  # Current position + displacement
         self.y += self.y_vel * Planet.TIMESTEP
+
         if self.revolution_complete:
             self.orbit.pop(0)
         self.orbit.append((self.x, self.y))  # Collection of positions to represent orbit path
 
-    def draw_to_body(self, win, body): # Draws line from one body to another
+    def draw_to_body(self, win, body):  # Draws line from one body to another
         pygame.draw.line(win, WHITE, (body.curr_x, body.curr_y), (self.curr_x, self.curr_y))
 
 
@@ -144,11 +143,11 @@ class Moon(Planet):
         self.distance_to_planet = distance_to_planet
 
     def draw(self, win, planet):
-        self.angle -= self.orbit_speed # Increasing value increases the speed of moon revolution
-        self.curr_x = planet.curr_x + (self.distance_to_planet * math.cos(self.angle)) # Adjusts moon's position based on planet
+        self.angle -= self.orbit_speed  # Increasing value increases the speed of moon revolution
+        self.curr_x = planet.curr_x + (self.distance_to_planet * math.cos(self.angle))  # Adjusts moon's position based on planet
         self.curr_y = planet.curr_y + (self.distance_to_planet * math.sin(self.angle))
 
-        # self.orbit.append((self.curr_x, self.curr_y)) # Uncomment if you want to draw the orbit of the moon
+        # self.orbit.append((self.curr_x, self.curr_y))  # Uncomment if you want to draw the orbit of the moon
         # if len(self.orbit) > 2:
         #     pygame.draw.lines(win, self.color, False, self.orbit, 1)
 
@@ -161,7 +160,7 @@ class Moon(Planet):
         draw_at_center(win, moon_sprite, self.curr_x, self.curr_y)
 
 
-def draw_at_center(win, image, x, y): # Centers the image being placed on screen
+def draw_at_center(win, image, x, y):  # Centers the image being placed on screen
     image_rect = image.get_rect(center=(x, y))
     win.blit(image, image_rect.topleft)
 
@@ -181,13 +180,13 @@ earth.earth = True
 mars = Planet(-1 * 1.5*Planet.AU, 0, sr.mars_radius, RED, 6.4171 * 10**23, 687, sprites.mars_sprites, True)
 mars.y_vel = 24.077 * 1000
 
-moon = Moon(earth.x + 0.00257 * Planet.AU, 0, sr.moon_radius, OFF_WHITE, 7.34767309 * 10**22, 300 * 4, sprites.moon_sprites, True, .069, earth, 30, 0)
+moon = Moon(earth.x + 0.00257 * Planet.AU, 0, sr.moon_radius, OFF_WHITE, 7.34767309 * 10**22, earth.year_to_days, sprites.moon_sprites, True, .069, earth, 30, 0)
 moon.moon = True
 
-phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, sr.phobos_radius, LIGHT_GRAY, 1.060 * 10**16, 500 * 4, sprites.phobos_sprites, True, .069, mars, 13, 0)
+phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, sr.phobos_radius, LIGHT_GRAY, 1.060 * 10**16, mars.year_to_days, sprites.phobos_sprites, True, .069, mars, 13, 0)
 phobos.moon = True
 
-deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, sr.deimos_radius, REDDISH_GRAY, 1.5 * 10**15, 500 * 4, sprites.deimos_sprites, True, .05175, mars, 20, 5)
+deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, sr.deimos_radius, REDDISH_GRAY, 1.5 * 10**15, mars.year_to_days, sprites.deimos_sprites, True, .05175, mars, 20, 5)
 
 planets = [sun, mercury, venus, earth, mars]
 moons = [moon, phobos, deimos]

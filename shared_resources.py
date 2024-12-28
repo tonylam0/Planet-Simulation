@@ -1,5 +1,7 @@
 # Variables shared between files to prevent circular importing
 
+WIDTH, HEIGHT = 1000, 800  # Width & height of window
+
 sun_radius = 100
 mercury_radius = 6
 venus_radius = 13
