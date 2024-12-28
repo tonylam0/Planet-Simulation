@@ -1,7 +1,8 @@
 import pygame
 import math
 import sprites
-import shared_resources as sr
+
+pygame.init()
 
 WIDTH, HEIGHT = 800, 800
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -16,6 +17,7 @@ BLUE = (0, 102, 204)
 RED = (188, 39, 50)
 OFF_WHITE = (190, 190, 190)
 REDDISH_GRAY = (150, 100, 100)
+
 
 class Planet(pygame.sprite.Sprite):
     AU = 149.6e6 * 1000  # Average distance from Earth to the Sun in meters
@@ -96,7 +98,8 @@ class Planet(pygame.sprite.Sprite):
                 self.opp_quadrant_flag = False
                 self.revolution_complete = True
 
-        planet_sprite = pygame.transform.rotate(self.sprites[int(self.current_sprite)], int(self.angle))
+        planet_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2*self.radius, 2*self.radius))
+        planet_sprite = pygame.transform.rotate(planet_sprite, int(self.angle))
         draw_at_center(WINDOW, planet_sprite, self.curr_x, self.curr_y)
 
     def attraction(self, other):  # Calculate Newton's law of universal gravitation 
@@ -167,29 +170,53 @@ def draw_at_center(win, image, x, y): # Centers the image being placed on screen
     image_rect = image.get_rect(center=(x, y))
     win.blit(image, image_rect.topleft)
 
-sun = Planet(0, 0, sr.sun_radius, YELLOW, 1.9882 * 10**30, 365, sprites.sun_sprites, True)
-sun.sun = True
+def main():
+    running = True
+    clock = pygame.time.Clock()
 
-mercury = Planet(1 * 0.4*Planet.AU, 0, sr.mercury_radius, LIGHT_GRAY, 3.3 * 10**2, 87.969, sprites.mercury_sprites, False)
-mercury.y_vel = -47.4 * 1000
+    sun = Planet(0, 0, 100, YELLOW, 1.9882 * 10**30, 365, sprites.sun_sprites, True)
+    sun.sun = True
 
-venus = Planet(1 * 0.72*Planet.AU, 0, sr.venus_radius, PALE_YELLOW, 4.8675 * 10**24, 225, sprites.venus_sprites, False)
-venus.y_vel = -35.02 * 1000
+    mercury = Planet(1 * 0.4*Planet.AU, 0, 6, LIGHT_GRAY, 3.3 * 10**2, 87.969, sprites.mercury_sprites, False)
+    mercury.y_vel = -47.4 * 1000
+    
+    venus = Planet(1 * 0.72*Planet.AU, 0, 13, PALE_YELLOW, 4.8675 * 10**24, 225, sprites.venus_sprites, False)
+    venus.y_vel = -35.02 * 1000
 
-earth = Planet(-1 * Planet.AU, 0, sr.earth_radius, BLUE, 5.9742 * 10**24, 365.242374, sprites.earth_sprites, True)
-earth.y_vel = 29.793 * 1000
-earth.earth = True
+    earth = Planet(-1 * Planet.AU, 0, 18, BLUE, 5.9742 * 10**24, 365.242374, sprites.earth_sprites, True)
+    earth.y_vel = 29.793 * 1000
+    earth.earth = True
 
-mars = Planet(-1 * 1.5*Planet.AU, 0, sr.mars_radius, RED, 6.4171 * 10**23, 687, sprites.mars_sprites, True)
-mars.y_vel = 24.077 * 1000
+    mars = Planet(-1 * 1.5*Planet.AU, 0, 9, RED, 6.4171 * 10**23, 687, sprites.mars_sprites, True)
+    mars.y_vel = 24.077 * 1000
 
-moon = Moon(earth.x + 0.00257 * Planet.AU, 0, sr.moon_radius, OFF_WHITE, 7.34767309 * 10**22, 300 * 4, sprites.moon_sprites, True, .069, earth, 30, 0)
-moon.moon = True
+    moon = Moon(earth.x + 0.00257 * Planet.AU, 0, (18/4), OFF_WHITE, 7.34767309 * 10**22, 300 * 4, sprites.moon_sprites, True, .069, earth, 30, 0)
+    moon.moon = True
 
-phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, sr.phobos_radius, LIGHT_GRAY, 1.060 * 10**16, 500 * 4, sprites.phobos_sprites, True, .069, mars, 13, 0)
-phobos.moon = True
+    phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, LIGHT_GRAY, 1.060 * 10**16, 500 * 4, sprites.phobos_sprites, True, .069, mars, 13, 0)
+    phobos.moon = True
 
-deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, sr.deimos_radius, REDDISH_GRAY, 1.5 * 10**15, 500 * 4, sprites.deimos_sprites, True, .05175, mars, 20, 5)
+    deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, 3, REDDISH_GRAY, 1.5 * 10**15, 500 * 4, sprites.deimos_sprites, True, .05175, mars, 20, 5)
 
-planets = [sun, mercury, venus, earth, mars]
-moons = [moon, phobos, deimos]
+    planets = [sun, mercury, venus, earth, mars]
+    moons = [moon, phobos, deimos]
+
+    while running:
+        clock.tick(60)
+        WINDOW.fill((0, 0, 0))
+
+        for planet in planets:
+            planet.update_position(planets)
+            planet.draw(WINDOW)
+
+        for satellite in moons:
+            satellite.draw(WINDOW, satellite.planet)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        pygame.display.update()
+    pygame.quit()
+
+main()
