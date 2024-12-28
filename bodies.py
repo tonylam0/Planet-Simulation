@@ -4,8 +4,6 @@ import sprites
 import shared_resources as sr
 
 WIDTH, HEIGHT = 800, 800
-WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("The Planetary System")
 
 # colors
 WHITE = (255, 255, 255)
@@ -59,7 +57,7 @@ class Planet(pygame.sprite.Sprite):
             for i in range(0, self.radius + 1):
                 fade = int(50 * (i / self.radius))  # Opacity starts off small
                 pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.curr_x, self.curr_y), 1.05 * self.radius - i)  # Radius starts off large
-            WINDOW.blit(GLOW_SURFACE, (0,0))
+            win.blit(GLOW_SURFACE, (0,0))
 
         if len(self.orbit) > 2:
             updated_points = []
@@ -97,7 +95,7 @@ class Planet(pygame.sprite.Sprite):
                 self.revolution_complete = True
 
         planet_sprite = pygame.transform.rotate(self.sprites[int(self.current_sprite)], int(self.angle))
-        draw_at_center(WINDOW, planet_sprite, self.curr_x, self.curr_y)
+        draw_at_center(win, planet_sprite, self.curr_x, self.curr_y)
 
     def attraction(self, other):  # Calculate Newton's law of universal gravitation 
         other_x, other_y = other.x, other.y
@@ -132,8 +130,8 @@ class Planet(pygame.sprite.Sprite):
             self.orbit.pop(0)
         self.orbit.append((self.x, self.y))  # Collection of positions to represent orbit path
 
-    def draw_to_body(self, body): # Draws line from one body to another
-        pygame.draw.line(WINDOW, WHITE, (body.curr_x, body.curr_y), (self.curr_x, self.curr_y))
+    def draw_to_body(self, win, body): # Draws line from one body to another
+        pygame.draw.line(win, WHITE, (body.curr_x, body.curr_y), (self.curr_x, self.curr_y))
 
 
 class Moon(Planet):
@@ -160,7 +158,7 @@ class Moon(Planet):
         self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
         moon_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2*self.radius, 2*self.radius))
         moon_sprite = pygame.transform.rotate(moon_sprite, int(self.planet.angle))
-        draw_at_center(WINDOW, moon_sprite, self.curr_x, self.curr_y)
+        draw_at_center(win, moon_sprite, self.curr_x, self.curr_y)
 
 
 def draw_at_center(win, image, x, y): # Centers the image being placed on screen
