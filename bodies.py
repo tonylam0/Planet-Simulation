@@ -207,7 +207,7 @@ class Moon(Planet):
         moon_sprite = pygame.transform.rotate(moon_sprite, int(planet.angle))
         draw_at_center(win, moon_sprite, self.curr_x, self.curr_y)
 
-    def draw_zoomed(self, win, planet, zoom_scale):
+    def draw_zoomed(self, win, focus_body, planet, zoom_scale):
         self.angle -= self.orbit_speed
         self.curr_x = planet.zoomed_x + (self.distance_to_planet * math.cos(self.angle)) * zoom_scale
         self.curr_y = planet.zoomed_y + (self.distance_to_planet * math.sin(self.angle)) * zoom_scale
@@ -216,12 +216,13 @@ class Moon(Planet):
         self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
         moon_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2 * int(zoomed_radius), 2 * int(zoomed_radius)))
         moon_sprite = pygame.transform.rotate(moon_sprite, int(planet.angle))
-        draw_at_center(win, moon_sprite, self.curr_x, self.curr_y)
+        draw_at_center(win, moon_sprite, self.curr_x, self.curr_y)      
 
 
 def draw_at_center(win, image, x, y):  # Centers the image being placed on screen
     image_rect = image.get_rect(center=(x, y))
     win.blit(image, image_rect.topleft)
+        
 
 sun = Planet(0, 0, sr.sun_radius, YELLOW, 1.9882 * 10**30, 365, sprites.sun_sprites, True)
 sun.sun = True
