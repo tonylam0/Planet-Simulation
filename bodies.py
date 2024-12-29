@@ -132,6 +132,57 @@ class Planet(pygame.sprite.Sprite):
     def draw_to_body(self, win, body):  # Draws line from one body to another
         pygame.draw.line(win, WHITE, (body.curr_x, body.curr_y), (self.curr_x, self.curr_y))
 
+    def draw_zoomed(self, win, focus_body, zoom_scale):
+        # Adjust position and size for zoom
+        self.zoomed_x = sr.WIDTH / 2 + (self.x - focus_body.x) * Planet.SCALE * zoom_scale
+        self.zoomed_y = sr.HEIGHT / 2 + (self.y - focus_body.y) * Planet.SCALE * zoom_scale
+        self.zoomed_radius = self.radius * zoom_scale
+
+        GLOW_SURFACE = pygame.Surface((sr.WIDTH, sr.HEIGHT), pygame.SRCALPHA)
+        if self.sun:
+            # Glow effect: applying multiple smaller but more opaque circles on top of each other
+            for i in range(0, self.radius + 1):
+                fade = int(50 * (i / self.radius))  # Opacity starts off small
+                pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.zoomed_x, self.zoomed_y), 1.05 * self.zoomed_radius - i)  # Radius starts off large
+            win.blit(GLOW_SURFACE, (0,0))
+
+        if len(self.orbit) > 2:
+            updated_points = []
+            for point in self.orbit:
+                x, y = point
+                x = sr.WIDTH / 2 + (x - focus_body.x) * Planet.SCALE * zoom_scale
+                y = sr.HEIGHT / 2 + (y - focus_body.y) * Planet.SCALE * zoom_scale
+                updated_points.append((x, y))
+
+            pygame.draw.lines(win, self.color, False, updated_points, 2)
+
+        self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
+        self.angle += 360 / self.year_to_days  # Degree per simulated day
+
+        # Used to calculate planet quadrant
+        cross_horizon_x = sr.WIDTH - self.x
+        cross_horizon_y = sr.HEIGHT - self.y
+        
+        # Based on which quadrant the planet is in, the angle will reset
+        if self.revolution:
+            if cross_horizon_x > sr.WIDTH / 2 and cross_horizon_y > sr.HEIGHT / 2: 
+                self.opp_quadrant_flag = True
+            if self.opp_quadrant_flag and cross_horizon_y < sr.HEIGHT / 2:
+                self.angle = 0
+                self.opp_quadrant_flag = False
+                self.revolution_complete = True
+        else:
+            if cross_horizon_x < sr.WIDTH / 2 and cross_horizon_y < sr.HEIGHT / 2:
+                self.opp_quadrant_flag = True
+            if self.opp_quadrant_flag and cross_horizon_y > sr.HEIGHT / 2:
+                self.angle = 0
+                self.opp_quadrant_flag = False
+                self.revolution_complete = True
+
+        planet_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2 * int(self.zoomed_radius), 2 * int(self.zoomed_radius)))
+        planet_sprite = pygame.transform.rotate(planet_sprite, int(self.angle))
+        draw_at_center(win, planet_sprite, self.zoomed_x, self.zoomed_y)
+
 
 class Moon(Planet):
     def __init__(self, x, y, radius, color, mass, year_to_days, sprite, revolution, orbit_speed, planet, distance_to_planet, angle):
@@ -151,12 +202,20 @@ class Moon(Planet):
         # if len(self.orbit) > 2:
         #     pygame.draw.lines(win, self.color, False, self.orbit, 1)
 
-        if len(self.orbit) > 2:
-            pygame.draw.lines(win, self.color, False, self.orbit, 1)
-
         self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
         moon_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2*self.radius, 2*self.radius))
-        moon_sprite = pygame.transform.rotate(moon_sprite, int(self.planet.angle))
+        moon_sprite = pygame.transform.rotate(moon_sprite, int(planet.angle))
+        draw_at_center(win, moon_sprite, self.curr_x, self.curr_y)
+
+    def draw_zoomed(self, win, planet, zoom_scale):
+        self.angle -= self.orbit_speed
+        self.curr_x = planet.zoomed_x + (self.distance_to_planet * math.cos(self.angle)) * zoom_scale
+        self.curr_y = planet.zoomed_y + (self.distance_to_planet * math.sin(self.angle)) * zoom_scale
+        zoomed_radius = self.radius * zoom_scale
+
+        self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
+        moon_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2 * int(zoomed_radius), 2 * int(zoomed_radius)))
+        moon_sprite = pygame.transform.rotate(moon_sprite, int(planet.angle))
         draw_at_center(win, moon_sprite, self.curr_x, self.curr_y)
 
 
