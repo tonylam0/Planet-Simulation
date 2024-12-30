@@ -104,8 +104,9 @@ def simulation_text(fps):
     speed_font = pygame.font.SysFont("verdana", 15)
     speed = round(fps / 60, 1)
     speed_text = speed_font.render(f"SPEED: {str(speed)}x", True, (255, 255, 255))
-    text_rect = speed_text.get_rect(center=((sr.WIDTH - sr.WIDTH / 18.5, sr.HEIGHT - sr.HEIGHT / 50)))
-    WINDOW.blit(speed_text, text_rect.topleft)
+    text_rect = speed_text.get_rect()
+    text_rect.bottomright = (sr.WIDTH - 10, sr.HEIGHT - 10)
+    WINDOW.blit(speed_text, text_rect)
 
 def main():
     running = True
@@ -152,9 +153,9 @@ def main():
 
         body_name(selected_body, hide)
 
-        WINDOW.blit(hide_text, (sr.WIDTH / 140, sr.HEIGHT - sr.HEIGHT / 18.5))
-        WINDOW.blit(camera_text, (sr.WIDTH / 140, sr.HEIGHT - sr.HEIGHT / 25))
-        WINDOW.blit(speed_text, (sr.WIDTH / 140, sr.HEIGHT - sr.HEIGHT / 40))
+        WINDOW.blit(hide_text, (10, sr.HEIGHT - 44))
+        WINDOW.blit(camera_text, (10, sr.HEIGHT - 33))
+        WINDOW.blit(speed_text, (10, sr.HEIGHT - 22))
 
         pygame.display.update()
 
