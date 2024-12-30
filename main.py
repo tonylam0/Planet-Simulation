@@ -146,16 +146,17 @@ def main():
 
         keys = pygame.key.get_pressed()
         fps = simulation_speed(keys, fps)
-
-        simulation_text(fps)
         
         display_bodies(selected_body)
 
+        simulation_text(fps)
+
         body_name(selected_body, hide)
 
-        WINDOW.blit(hide_text, (10, sr.HEIGHT - 44))
-        WINDOW.blit(camera_text, (10, sr.HEIGHT - 33))
-        WINDOW.blit(speed_text, (10, sr.HEIGHT - 22))
+        # # Uncomment to display keybind controls
+        # WINDOW.blit(hide_text, (10, sr.HEIGHT - 44))
+        # WINDOW.blit(camera_text, (10, sr.HEIGHT - 33))
+        # WINDOW.blit(speed_text, (10, sr.HEIGHT - 22))
 
         pygame.display.update()
 
