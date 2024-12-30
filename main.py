@@ -152,9 +152,9 @@ def main():
 
         body_name(selected_body, hide)
 
-        WINDOW.blit(hide_text, (sr.WIDTH / 90, sr.HEIGHT - sr.HEIGHT / 18.5))
-        WINDOW.blit(camera_text, (sr.WIDTH / 90, sr.HEIGHT - sr.HEIGHT / 25))
-        WINDOW.blit(speed_text, (sr.WIDTH / 90, sr.HEIGHT - sr.HEIGHT / 40))
+        WINDOW.blit(hide_text, (sr.WIDTH / 140, sr.HEIGHT - sr.HEIGHT / 18.5))
+        WINDOW.blit(camera_text, (sr.WIDTH / 140, sr.HEIGHT - sr.HEIGHT / 25))
+        WINDOW.blit(speed_text, (sr.WIDTH / 140, sr.HEIGHT - sr.HEIGHT / 40))
 
         pygame.display.update()
 
