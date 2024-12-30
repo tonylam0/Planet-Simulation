@@ -99,6 +99,13 @@ def body_name(selected_body, hide):  # Displays name of body when zoomed in
         else:
             WINDOW.blit(body_text, 
                 (sr.WIDTH / 2, sr.HEIGHT / 2 + selected_body.radius))
+            
+def simulation_text(fps):
+    speed_font = pygame.font.SysFont("verdana", 15)
+    speed = round(fps / 60, 1)
+    speed_text = speed_font.render(f"SPEED: {str(speed)}x", True, (255, 255, 255))
+    text_rect = speed_text.get_rect(center=((sr.WIDTH - sr.WIDTH / 18.5, sr.HEIGHT - sr.HEIGHT / 50)))
+    WINDOW.blit(speed_text, text_rect.topleft)
 
 def main():
     running = True
@@ -138,6 +145,8 @@ def main():
 
         keys = pygame.key.get_pressed()
         fps = simulation_speed(keys, fps)
+
+        simulation_text(fps)
         
         display_bodies(selected_body)
 
