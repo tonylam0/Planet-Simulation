@@ -24,8 +24,13 @@ class Planet(pygame.sprite.Sprite):
         self.radius = radius
         self.color = color
         self.mass = mass  # In kilograms
-        self.curr_x = 0
-        self.curr_y = 0
+        
+        # Used to initiate planet position for mouse tracking
+        self.scaled_x = 0
+        self.scaled_y = 0
+        self.zoomed_x = 0
+        self.zoomed_y = 0
+        self.zoomed_radius = self.radius * sr.zoom_scale
 
         self.orbit = []
         self.sun = False
@@ -46,15 +51,15 @@ class Planet(pygame.sprite.Sprite):
 
     def draw(self, win):
         # Adjusts planet size & position to fit screen from the center
-        self.curr_x = self.x * Planet.SCALE + sr.WIDTH / 2
-        self.curr_y = self.y * Planet.SCALE + sr.HEIGHT / 2
+        self.scaled_x = self.x * Planet.SCALE + sr.WIDTH / 2
+        self.scaled_y = self.y * Planet.SCALE + sr.HEIGHT / 2
         
         GLOW_SURFACE = pygame.Surface((sr.WIDTH, sr.HEIGHT), pygame.SRCALPHA)
         if self.sun:
             # Glow effect: applying multiple smaller but more opaque circles on top of each other
             for i in range(0, self.radius + 1):
                 fade = int(50 * (i / self.radius))  # Opacity starts off small
-                pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.curr_x, self.curr_y), 1.05 * self.radius - i)  # Radius starts off large
+                pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.scaled_x, self.scaled_y), 1.05 * self.radius - i)  # Radius starts off large
             win.blit(GLOW_SURFACE, (0,0))
 
         if len(self.orbit) > 2:
@@ -73,8 +78,8 @@ class Planet(pygame.sprite.Sprite):
         self.angle += 360 / self.year_to_days  # Degree per simulated day
 
         # Used to calculate planet quadrant
-        cross_horizon_x = sr.WIDTH - self.curr_x
-        cross_horizon_y = sr.HEIGHT - self.curr_y
+        cross_horizon_x = sr.WIDTH - self.scaled_x
+        cross_horizon_y = sr.HEIGHT - self.scaled_y
         
         # Based on which quadrant the planet is in, the angle will reset
         if self.revolution:
@@ -93,7 +98,7 @@ class Planet(pygame.sprite.Sprite):
                 self.revolution_complete = True
 
         planet_sprite = pygame.transform.rotate(self.sprites[int(self.current_sprite)], int(self.angle))
-        draw_at_center(win, planet_sprite, self.curr_x, self.curr_y)
+        draw_at_center(win, planet_sprite, self.scaled_x, self.scaled_y)
 
     def attraction(self, other):  # Calculate Newton's law of universal gravitation 
         other_x, other_y = other.x, other.y
@@ -129,41 +134,40 @@ class Planet(pygame.sprite.Sprite):
             self.orbit.pop(0)
         self.orbit.append((self.x, self.y))  # Collection of positions to represent orbit path
 
-    def draw_to_body(self, win, body):  # Draws line from one body to another
-        pygame.draw.line(win, WHITE, (body.curr_x, body.curr_y), (self.curr_x, self.curr_y))
+    def update_zoomed_position(self, focus_body):
+        # Updates position of the planet relative to zoomed in body
+        self.zoomed_x = sr.WIDTH / 2 + (self.x - focus_body.x) * Planet.SCALE * sr.zoom_scale
+        self.zoomed_y = sr.HEIGHT / 2 + (self.y - focus_body.y) * Planet.SCALE * sr.zoom_scale
 
-    def draw_zoomed(self, win, focus_body, zoom_scale):
-        # Adjust position and size for zoom
-        self.zoomed_x = sr.WIDTH / 2 + (self.x - focus_body.x) * Planet.SCALE * zoom_scale
-        self.zoomed_y = sr.HEIGHT / 2 + (self.y - focus_body.y) * Planet.SCALE * zoom_scale
-        self.zoomed_radius = self.radius * zoom_scale
+    def draw_zoomed(self, win, focus_body):
+        self.scaled_x = self.x * Planet.SCALE + sr.WIDTH / 2
+        self.scaled_y = self.y * Planet.SCALE + sr.HEIGHT / 2
+        self.zoomed_radius = self.radius * sr.zoom_scale
 
         GLOW_SURFACE = pygame.Surface((sr.WIDTH, sr.HEIGHT), pygame.SRCALPHA)
-        if self.sun:
-            # Glow effect: applying multiple smaller but more opaque circles on top of each other
+        if self.sun:  # Draws sun glow in zoomed in mode
             for i in range(0, self.radius + 1):
-                fade = int(50 * (i / self.radius))  # Opacity starts off small
-                pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.zoomed_x, self.zoomed_y), 1.05 * self.zoomed_radius - i)  # Radius starts off large
+                fade = int(50 * (i / self.radius))
+                pygame.draw.circle(GLOW_SURFACE, (*self.color, fade), (self.zoomed_x, self.zoomed_y), 1.05 * self.zoomed_radius / 1.25 - i) 
             win.blit(GLOW_SURFACE, (0,0))
 
         if len(self.orbit) > 2:
             updated_points = []
             for point in self.orbit:
                 x, y = point
-                x = sr.WIDTH / 2 + (x - focus_body.x) * Planet.SCALE * zoom_scale
-                y = sr.HEIGHT / 2 + (y - focus_body.y) * Planet.SCALE * zoom_scale
+                # Offsets orbit trail from selected body
+                x = sr.WIDTH / 2 + (x - focus_body.x) * Planet.SCALE * sr.zoom_scale
+                y = sr.HEIGHT / 2 + (y - focus_body.y) * Planet.SCALE * sr.zoom_scale
                 updated_points.append((x, y))
 
             pygame.draw.lines(win, self.color, False, updated_points, 2)
 
         self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
-        self.angle += 360 / self.year_to_days  # Degree per simulated day
+        self.angle += 360 / self.year_to_days
 
-        # Used to calculate planet quadrant
-        cross_horizon_x = sr.WIDTH - self.x
-        cross_horizon_y = sr.HEIGHT - self.y
+        cross_horizon_x = sr.WIDTH - self.scaled_x
+        cross_horizon_y = sr.HEIGHT - self.scaled_y
         
-        # Based on which quadrant the planet is in, the angle will reset
         if self.revolution:
             if cross_horizon_x > sr.WIDTH / 2 and cross_horizon_y > sr.HEIGHT / 2: 
                 self.opp_quadrant_flag = True
@@ -183,6 +187,9 @@ class Planet(pygame.sprite.Sprite):
         planet_sprite = pygame.transform.rotate(planet_sprite, int(self.angle))
         draw_at_center(win, planet_sprite, self.zoomed_x, self.zoomed_y)
 
+    def draw_to_body(self, win, body):  # Draws line from one body to another
+        pygame.draw.line(win, WHITE, (body.scaled_x, body.scaled_y), (self.scaled_x, self.scaled_y))
+
 
 class Moon(Planet):
     def __init__(self, x, y, radius, color, mass, year_to_days, sprite, revolution, orbit_speed, planet, distance_to_planet, angle):
@@ -192,38 +199,58 @@ class Moon(Planet):
         self.orbit_speed = orbit_speed
         self.planet = planet
         self.distance_to_planet = distance_to_planet
+        self.zoomed_x = 0  # Used to initialize moon position for mouse tracking
+        self.zoomed_y = 0
+        self.zoomed_radius = self.radius * sr.zoom_scale
 
     def draw(self, win, planet):
         self.angle -= self.orbit_speed  # Increasing value increases the speed of moon revolution
-        self.curr_x = planet.curr_x + (self.distance_to_planet * math.cos(self.angle))  # Adjusts moon's position based on planet
-        self.curr_y = planet.curr_y + (self.distance_to_planet * math.sin(self.angle))
 
-        # self.orbit.append((self.curr_x, self.curr_y))  # Uncomment if you want to draw the orbit of the moon
+        # Adjusts moon's position based on planet
+        self.scaled_x = planet.scaled_x + (self.distance_to_planet * math.cos(self.angle))
+        self.scaled_y = planet.scaled_y + (self.distance_to_planet * math.sin(self.angle))
+
+        # # Uncomment if you want to draw the orbit of the moon
+        # self.orbit.append((self.scaled_x, self.scaled_y))
         # if len(self.orbit) > 2:
         #     pygame.draw.lines(win, self.color, False, self.orbit, 1)
 
         self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
         moon_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2*self.radius, 2*self.radius))
         moon_sprite = pygame.transform.rotate(moon_sprite, int(planet.angle))
-        draw_at_center(win, moon_sprite, self.curr_x, self.curr_y)
+        draw_at_center(win, moon_sprite, self.scaled_x, self.scaled_y)
 
-    def draw_zoomed(self, win, focus_body, planet, zoom_scale):
+    def update_moon_position(self, focus_body, planet):
+        # Turns planet-dependent position into a non-scalable position
+        self.x = self.planet.x + (self.distance_to_planet / 3 / Planet.SCALE * math.cos(self.angle)) * sr.zoom_scale
+        self.y = self.planet.y + (self.distance_to_planet / 3 / Planet.SCALE * math.sin(self.angle)) * sr.zoom_scale
+        self.planet_angle = planet.angle
+
+    def draw_zoomed(self, win, focus_body, planet):
         self.angle -= self.orbit_speed
-        self.curr_x = planet.zoomed_x + (self.distance_to_planet * math.cos(self.angle)) * zoom_scale
-        self.curr_y = planet.zoomed_y + (self.distance_to_planet * math.sin(self.angle)) * zoom_scale
-        zoomed_radius = self.radius * zoom_scale
+        self.zoomed_radius = self.radius * sr.zoom_scale
 
         self.current_sprite = (self.current_sprite + .15) % len(self.sprites)
-        moon_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2 * int(zoomed_radius), 2 * int(zoomed_radius)))
-        moon_sprite = pygame.transform.rotate(moon_sprite, int(planet.angle))
-        draw_at_center(win, moon_sprite, self.curr_x, self.curr_y)      
+        moon_sprite = pygame.transform.scale(self.sprites[int(self.current_sprite)], (2 * int(self.zoomed_radius), 2 * int(self.zoomed_radius)))
+        moon_sprite = pygame.transform.rotate(moon_sprite, int(self.planet_angle))
+    
+        if focus_body.moon:  # Independent moon position
+            self.zoomed_x = sr.WIDTH / 2 + (self.x - focus_body.x) * Planet.SCALE * sr.zoom_scale
+            self.zoomed_y = sr.HEIGHT / 2 + (self.y - focus_body.y) * Planet.SCALE * sr.zoom_scale
+            
+            # Draw the moon at the correct position with the correct zoomed size
+            draw_at_center(win, moon_sprite, self.zoomed_x, self.zoomed_y) 
+        else:  # Planet-dependent position         
+            self.x = planet.zoomed_x + (self.distance_to_planet * math.cos(self.angle)) * sr.zoom_scale
+            self.y = planet.zoomed_y + (self.distance_to_planet * math.sin(self.angle)) * sr.zoom_scale
+            # Draw the moon at the correct position with the correct zoomed size
+            draw_at_center(win, moon_sprite, self.x, self.y)   
 
 
 def draw_at_center(win, image, x, y):  # Centers the image being placed on screen
     image_rect = image.get_rect(center=(x, y))
     win.blit(image, image_rect.topleft)
         
-
 sun = Planet(0, 0, sr.sun_radius, YELLOW, 1.9882 * 10**30, 365, sprites.sun_sprites, True)
 sun.sun = True
 
@@ -247,6 +274,7 @@ phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, sr.phobos_radius, LIGHT_GRAY, 1.0
 phobos.moon = True
 
 deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, sr.deimos_radius, REDDISH_GRAY, 1.5 * 10**15, mars.year_to_days, sprites.deimos_sprites, True, .05175, mars, 20, 5)
+deimos.moon = True
 
 planets = [sun, mercury, venus, earth, mars]
 moons = [moon, phobos, deimos]
