@@ -3,6 +3,7 @@ import math
 import sprites
 import shared_resources as sr
 
+
 WHITE = (255, 255, 255)
 YELLOW = (249, 215, 28)
 LIGHT_GRAY = (169, 169, 169)
@@ -18,7 +19,8 @@ class Planet(pygame.sprite.Sprite):
     SCALE = 250 / AU  # 1 AU = 100 pixels
     TIMESTEP = 3600*24  # 1 day elapsed
 
-    def __init__(self, x, y, radius, color, mass, year_to_days, sprite, revolution):
+    def __init__(self, name, x, y, radius, color, mass, year_to_days, sprite, revolution):
+        self.name = name  # Used to display name during zoom-in
         self.x = x
         self.y = y
         self.radius = radius
@@ -192,11 +194,14 @@ class Planet(pygame.sprite.Sprite):
 
 
 class Moon(Planet):
-    def __init__(self, x, y, radius, color, mass, year_to_days, sprite, revolution, orbit_speed, planet, distance_to_planet, angle):
-        super().__init__(x, y, radius, color, mass, year_to_days, sprite, revolution)
+    def __init__(self, name, x, y, radius, color, mass, year_to_days, sprite, revolution, orbit_speed, planet, distance_to_planet, angle):
+        super().__init__(name, x, y, radius, color, mass, year_to_days, sprite, revolution)
+        self.name = name
+
         self.orbit = []
         self.angle = angle
         self.orbit_speed = orbit_speed
+
         self.planet = planet
         self.distance_to_planet = distance_to_planet
         self.zoomed_x = 0  # Used to initialize moon position for mouse tracking
@@ -251,29 +256,37 @@ def draw_at_center(win, image, x, y):  # Centers the image being placed on scree
     image_rect = image.get_rect(center=(x, y))
     win.blit(image, image_rect.topleft)
         
-sun = Planet(0, 0, sr.sun_radius, YELLOW, 1.9882 * 10**30, 365, sprites.sun_sprites, True)
+sun = Planet("Sun", 0, 0, sr.sun_radius, YELLOW, 
+    1.9882 * 10**30, 365, sprites.sun_sprites, True)
 sun.sun = True
 
-mercury = Planet(1 * 0.4*Planet.AU, 0, sr.mercury_radius, LIGHT_GRAY, 3.3 * 10**2, 87.969, sprites.mercury_sprites, False)
+mercury = Planet("Mercury", 1 * 0.4*Planet.AU, 0, sr.mercury_radius, LIGHT_GRAY, 
+    3.3 * 10**2, 87.969, sprites.mercury_sprites, False)
 mercury.y_vel = -47.4 * 1000
 
-venus = Planet(1 * 0.72*Planet.AU, 0, sr.venus_radius, PALE_YELLOW, 4.8675 * 10**24, 225, sprites.venus_sprites, False)
+venus = Planet("Venus", 1 * 0.72*Planet.AU, 0, sr.venus_radius, PALE_YELLOW,
+    4.8675 * 10**24, 225, sprites.venus_sprites, False)
 venus.y_vel = -35.02 * 1000
 
-earth = Planet(-1 * Planet.AU, 0, sr.earth_radius, BLUE, 5.9742 * 10**24, 365.242374, sprites.earth_sprites, True)
+earth = Planet("Earth", -1 * Planet.AU, 0, sr.earth_radius, BLUE, 
+    5.9742 * 10**24, 365.242374, sprites.earth_sprites, True)
 earth.y_vel = 29.793 * 1000
 earth.earth = True
 
-mars = Planet(-1 * 1.5*Planet.AU, 0, sr.mars_radius, RED, 6.4171 * 10**23, 687, sprites.mars_sprites, True)
+mars = Planet("Mars", -1 * 1.5*Planet.AU, 0, sr.mars_radius, RED, 
+    6.4171 * 10**23, 687, sprites.mars_sprites, True)
 mars.y_vel = 24.077 * 1000
 
-moon = Moon(earth.x + 0.00257 * Planet.AU, 0, sr.moon_radius, OFF_WHITE, 7.34767309 * 10**22, earth.year_to_days, sprites.moon_sprites, True, .069, earth, 30, 0)
+moon = Moon("Moon", earth.x + 0.00257 * Planet.AU, 0, sr.moon_radius, OFF_WHITE, 
+    7.34767309 * 10**22, earth.year_to_days, sprites.moon_sprites, True, .069, earth, 30, 0)
 moon.moon = True
 
-phobos = Moon(mars.x + 0.00257 * Planet.AU, 0, sr.phobos_radius, LIGHT_GRAY, 1.060 * 10**16, mars.year_to_days, sprites.phobos_sprites, True, .069, mars, 13, 0)
+phobos = Moon("Phobos", mars.x + 0.00257 * Planet.AU, 0, sr.phobos_radius, LIGHT_GRAY, 
+    1.060 * 10**16, mars.year_to_days, sprites.phobos_sprites, True, .069, mars, 13, 0)
 phobos.moon = True
 
-deimos = Moon(mars.x + 0.00257 * Planet.AU, 0, sr.deimos_radius, REDDISH_GRAY, 1.5 * 10**15, mars.year_to_days, sprites.deimos_sprites, True, .05175, mars, 20, 5)
+deimos = Moon("Deimos", mars.x + 0.00257 * Planet.AU, 0, sr.deimos_radius, REDDISH_GRAY, 
+    1.5 * 10**15, mars.year_to_days, sprites.deimos_sprites, True, .05175, mars, 20, 5)
 deimos.moon = True
 
 planets = [sun, mercury, venus, earth, mars]

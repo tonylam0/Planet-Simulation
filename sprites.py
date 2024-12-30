@@ -1,6 +1,7 @@
 import pygame
 import shared_resources as sr
 
+
 def cut_spritesheet(image, sprite_num):
     image_width = image.get_width()
     sprite_lst = []

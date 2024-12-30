@@ -2,20 +2,25 @@ import pygame
 import bodies
 import shared_resources as sr
 
+
 pygame.init()
 pygame.font.init()
-text_font = pygame.font.SysFont("arial", 10)
+text_font = pygame.font.SysFont("verdana", 10)
 
 WINDOW = pygame.display.set_mode((sr.WIDTH, sr.HEIGHT))
 pygame.display.set_caption("The Planetary System")
 
-def event_handling(event, selected_body, key_to_body):
+def event_handling(event, selected_body, key_to_body, hide):
     if event.type == pygame.QUIT:
-        return False, selected_body
+        return False, selected_body, hide
 
     elif event.type == pygame.KEYDOWN:  # Checks for key press
         if event.key in key_to_body:
             selected_body = key_to_body[event.key]
+        elif event.key == pygame.K_h and hide:
+            hide = False
+        elif event.key == pygame.K_h and not hide:
+            hide = True
 
     # Checks for left mouse button
     elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -34,7 +39,7 @@ def event_handling(event, selected_body, key_to_body):
                 selected_body = body
                 break
 
-    return True, selected_body
+    return True, selected_body, hide
 
 def simulation_speed(keys, fps):
     if keys[pygame.K_RIGHT] and fps < 180:
@@ -78,11 +83,29 @@ def display_bodies(selected_body):
         for satellite in bodies.moons:
             satellite.draw(WINDOW, satellite.planet)
 
+def body_name(selected_body, hide):  # Displays name of body when zoomed in
+    if selected_body and not hide:
+        if not selected_body.sun:
+            font_size = 20
+        else:
+            font_size = 25
+
+        object_font = pygame.font.SysFont("verdana", font_size)
+        body_text = object_font.render(selected_body.name, True, selected_body.color)
+
+        if not selected_body.sun:
+            WINDOW.blit(body_text, 
+                (sr.WIDTH / 2, sr.HEIGHT / 2 + selected_body.zoomed_radius))
+        else:
+            WINDOW.blit(body_text, 
+                (sr.WIDTH / 2, sr.HEIGHT / 2 + selected_body.radius))
+
 def main():
     running = True
     clock = pygame.time.Clock()
     selected_body = None  # Track the currently selected body
     fps = 60  # Simulation speed
+    hide = True  # Used to display zoomed-in planet/moon name
 
     key_to_body = {  # Certain keybinds are set to certain planets
     pygame.K_r: None,
@@ -97,10 +120,13 @@ def main():
     }
 
     camera_text = text_font.render(
-                "PRESS NUMBERS 1-8 TO VIEW DIFFERENT CAMERAS OR CLICK CELESTIAL BODY",
+                "PRESS 1 - 8 TO VIEW DIFFERENT CAMERAS OR CLICK CELESTIAL BODY",
                 True, (255, 255, 255))
     speed_text = text_font.render(
                 "LEFT ARROW TO SLOW DOWN | RIGHT ARROW TO SPEED UP | SPACE TO RESET SPEED",
+                True, (255, 255, 255))
+    hide_text = text_font.render(
+                "PRESS h to HIDE/UNHIDE ZOOMED IN PLANET/MOON NAME",
                 True, (255, 255, 255))
 
     while running:
@@ -108,15 +134,18 @@ def main():
         WINDOW.fill((0, 0, 0))
 
         for event in pygame.event.get():
-            running, selected_body = event_handling(event, selected_body, key_to_body)
+            running, selected_body, hide = event_handling(event, selected_body, key_to_body, hide)
 
         keys = pygame.key.get_pressed()
         fps = simulation_speed(keys, fps)
         
         display_bodies(selected_body)
 
-        WINDOW.blit(camera_text, (sr.WIDTH / 75, sr.HEIGHT - sr.HEIGHT / 25))
-        WINDOW.blit(speed_text, (sr.WIDTH / 75, sr.HEIGHT - sr.HEIGHT / 40))
+        body_name(selected_body, hide)
+
+        WINDOW.blit(hide_text, (sr.WIDTH / 90, sr.HEIGHT - sr.HEIGHT / 18.5))
+        WINDOW.blit(camera_text, (sr.WIDTH / 90, sr.HEIGHT - sr.HEIGHT / 25))
+        WINDOW.blit(speed_text, (sr.WIDTH / 90, sr.HEIGHT - sr.HEIGHT / 40))
 
         pygame.display.update()
 
