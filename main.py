@@ -1,16 +1,17 @@
 import pygame
 import bodies
 import shared_resources as sr
-import math
 
 pygame.init()
+pygame.font.init()
+text_font = pygame.font.SysFont("arial", 10)
 
 WINDOW = pygame.display.set_mode((sr.WIDTH, sr.HEIGHT))
 pygame.display.set_caption("The Planetary System")
 
 def event_handling(event, selected_body, key_to_body):
     if event.type == pygame.QUIT:
-        return False
+        return False, selected_body
 
     elif event.type == pygame.KEYDOWN:  # Checks for key press
         if event.key in key_to_body:
@@ -24,7 +25,7 @@ def event_handling(event, selected_body, key_to_body):
             # Based off of circle formula
             mouse_inside_body = (body.scaled_x - mouse_x) ** 2 + (
                 body.scaled_y - mouse_y) ** 2 <= body.radius ** 2
-            if mouse_inside_body and selected_body == None:
+            if mouse_inside_body and selected_body is None:
                 selected_body = body
                 break
             # Checks for qualifed mouseclick while already zoomed in
@@ -95,6 +96,13 @@ def main():
     pygame.K_8: bodies.deimos,
     }
 
+    camera_text = text_font.render(
+                "PRESS NUMBERS 1-8 TO VIEW DIFFERENT CAMERAS OR CLICK CELESTIAL BODY",
+                True, (255, 255, 255))
+    speed_text = text_font.render(
+                "LEFT ARROW TO SLOW DOWN | RIGHT ARROW TO SPEED UP | SPACE TO RESET SPEED",
+                True, (255, 255, 255))
+
     while running:
         clock.tick(fps)
         WINDOW.fill((0, 0, 0))
@@ -106,6 +114,9 @@ def main():
         fps = simulation_speed(keys, fps)
         
         display_bodies(selected_body)
+
+        WINDOW.blit(camera_text, (sr.WIDTH / 75, sr.HEIGHT - sr.HEIGHT / 25))
+        WINDOW.blit(speed_text, (sr.WIDTH / 75, sr.HEIGHT - sr.HEIGHT / 40))
 
         pygame.display.update()
 
