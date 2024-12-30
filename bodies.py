@@ -241,10 +241,10 @@ class Moon(Planet):
             # Draw the moon at the correct position with the correct zoomed size
             draw_at_center(win, moon_sprite, self.zoomed_x, self.zoomed_y) 
         else:  # Planet-dependent position         
-            self.x = planet.zoomed_x + (self.distance_to_planet * math.cos(self.angle)) * sr.zoom_scale
-            self.y = planet.zoomed_y + (self.distance_to_planet * math.sin(self.angle)) * sr.zoom_scale
+            self.zoomed_x = planet.zoomed_x + (self.distance_to_planet * math.cos(self.angle)) * sr.zoom_scale
+            self.zoomed_y = planet.zoomed_y + (self.distance_to_planet * math.sin(self.angle)) * sr.zoom_scale
             # Draw the moon at the correct position with the correct zoomed size
-            draw_at_center(win, moon_sprite, self.x, self.y)   
+            draw_at_center(win, moon_sprite, self.zoomed_x, self.zoomed_y)   
 
 
 def draw_at_center(win, image, x, y):  # Centers the image being placed on screen
