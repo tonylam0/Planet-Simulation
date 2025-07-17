@@ -15,11 +15,11 @@ REDDISH_GRAY = (150, 100, 100)
 
 class Planet(pygame.sprite.Sprite):
     AU = 149.6e6 * 1000  # Average distance from Earth to the Sun in meters
-    G = 6.67428e-11  # Graviational constant = calculates gravitional force
+    G = 6.67428e-11  # Graviational constant -> calculates gravitional force
     SCALE = 250 / AU  # 1 AU = 100 pixels
     TIMESTEP = 3600*24  # 1 day elapsed
 
-    def __init__(self, name, x, y, radius, color, mass, year_to_days, sprite, revolution):
+    def __init__(self, name, x, y, radius, color, mass, initial_x_vel, initial_y_vel, year_to_days, sprite, flipped):
         self.name = name  # Used to display name during zoom-in
         self.x = x
         self.y = y
@@ -40,16 +40,16 @@ class Planet(pygame.sprite.Sprite):
         self.distance_to_sun = 0
         self.earth = False
 
-        self.x_vel = 0
-        self.y_vel = 0
+        self.x_vel = initial_x_vel
+        self.y_vel = initial_y_vel
 
         self.sprites = sprite
         self.current_sprite = 0
         self.angle = 0
         self.year_to_days = year_to_days
-        self.revolution = revolution  # Shows whether initial x coordinate was flipped or not
-        self.opp_quadrant_flag = False  # Checks if planet has reached opposite planal quadrant
-        self.revolution_complete = False  # Checks if a revolution has been complete
+        self.flipped = flipped  # Shows whether initial x coordinate was flipped or not
+        self.opp_quadrant_flag = False  # Checks if planet has reached fourth/opposite planal quadrant
+        self.revolution_complete = False  # Used to minimize the size of the orbit points array
 
     def draw(self, win):
         # Adjusts planet size & position to fit screen from the center
@@ -80,18 +80,21 @@ class Planet(pygame.sprite.Sprite):
         self.angle += 360 / self.year_to_days  # Degree per simulated day
 
         # Used to calculate planet quadrant
+        # Calculates the distance between the planet and the end of the screen
         cross_horizon_x = sr.WIDTH - self.scaled_x
         cross_horizon_y = sr.HEIGHT - self.scaled_y
         
         # Based on which quadrant the planet is in, the angle will reset
-        if self.revolution:
+        if self.flipped:
+            # Checks if the planet is before the imaginary halfway vertical and horizontal line
             if cross_horizon_x > sr.WIDTH / 2 and cross_horizon_y > sr.HEIGHT / 2: 
                 self.opp_quadrant_flag = True
+            # Checks if planet has returned back to the first quadrant which resets the sprite    
             if self.opp_quadrant_flag and cross_horizon_y < sr.HEIGHT / 2:
                 self.angle = 0
                 self.opp_quadrant_flag = False
                 self.revolution_complete = True
-        else:
+        else:  # signs are flipped to account for flipped initial position
             if cross_horizon_x < sr.WIDTH / 2 and cross_horizon_y < sr.HEIGHT / 2:
                 self.opp_quadrant_flag = True
             if self.opp_quadrant_flag and cross_horizon_y > sr.HEIGHT / 2:
@@ -104,17 +107,17 @@ class Planet(pygame.sprite.Sprite):
 
     def attraction(self, other):  # Calculate Newton's law of universal gravitation 
         other_x, other_y = other.x, other.y
-        distance_x = other_x - self.x  # Represents r in newton's equation
+        distance_x = other_x - self.x
         distance_y = other_y - self.y
-        radius = math.sqrt(distance_x**2 + distance_y**2)  # Can exclude the sqrt because the equation requires r^2 anyways
+        radius = math.sqrt(distance_x**2 + distance_y**2)  # Represents r in newton's equation
 
         if other.sun:
             self.distance_to_sun = radius
         
         force = self.G * self.mass * other.mass / radius**2
-        theta = math.atan2(distance_y, distance_x)
-        force_x = math.cos(theta) * force
-        force_y = math.sin(theta) * force
+        theta = math.atan2(distance_y, distance_x)  # Angle from the triangle formed between both bodies
+        force_x = math.cos(theta) * force  # force in the x direction
+        force_y = math.sin(theta) * force  # force in the y direction
         return force_x, force_y
     
     def update_position(self, planets):
@@ -170,7 +173,7 @@ class Planet(pygame.sprite.Sprite):
         cross_horizon_x = sr.WIDTH - self.scaled_x
         cross_horizon_y = sr.HEIGHT - self.scaled_y
         
-        if self.revolution:
+        if self.flipped:
             if cross_horizon_x > sr.WIDTH / 2 and cross_horizon_y > sr.HEIGHT / 2: 
                 self.opp_quadrant_flag = True
             if self.opp_quadrant_flag and cross_horizon_y < sr.HEIGHT / 2:
@@ -194,8 +197,8 @@ class Planet(pygame.sprite.Sprite):
 
 
 class Moon(Planet):
-    def __init__(self, name, x, y, radius, color, mass, year_to_days, sprite, revolution, orbit_speed, planet, distance_to_planet, angle):
-        super().__init__(name, x, y, radius, color, mass, year_to_days, sprite, revolution)
+    def __init__(self, name, x, y, radius, color, mass, initial_x_vel, initial_y_vel, year_to_days, sprite, flipped, orbit_speed, planet, distance_to_planet, angle):
+        super().__init__(name, x, y, radius, color, mass, initial_x_vel, initial_y_vel, year_to_days, sprite, flipped)
         self.name = name
 
         self.orbit = []
@@ -257,36 +260,32 @@ def draw_at_center(win, image, x, y):  # Centers the image being placed on scree
     win.blit(image, image_rect.topleft)
         
 sun = Planet("Sun", 0, 0, sr.sun_radius, YELLOW, 
-    1.9882 * 10**30, 365, sprites.sun_sprites, True)
+    1.9882 * 10**30, 0, 0, 365, sprites.sun_sprites, True)
 sun.sun = True
 
 mercury = Planet("Mercury", 1 * 0.4*Planet.AU, 0, sr.mercury_radius, LIGHT_GRAY, 
-    3.3 * 10**2, 87.969, sprites.mercury_sprites, False)
-mercury.y_vel = -47.4 * 1000
+    3.3 * 10**2, 0, -47.4 * 1000, 87.969, sprites.mercury_sprites, False)
 
 venus = Planet("Venus", 1 * 0.72*Planet.AU, 0, sr.venus_radius, PALE_YELLOW,
-    4.8675 * 10**24, 225, sprites.venus_sprites, False)
-venus.y_vel = -35.02 * 1000
+    4.8675 * 10**24, 0, -35.02 * 1000, 225, sprites.venus_sprites, False)
 
 earth = Planet("Earth", -1 * Planet.AU, 0, sr.earth_radius, BLUE, 
-    5.9742 * 10**24, 365.242374, sprites.earth_sprites, True)
-earth.y_vel = 29.793 * 1000
+    5.9742 * 10**24, 0, 29.793 * 1000, 365.242374, sprites.earth_sprites, True)
 earth.earth = True
 
 mars = Planet("Mars", -1 * 1.5*Planet.AU, 0, sr.mars_radius, RED, 
-    6.4171 * 10**23, 687, sprites.mars_sprites, True)
-mars.y_vel = 24.077 * 1000
+    6.4171 * 10**23, 0, 24.077 * 1000, 687, sprites.mars_sprites, True)
 
 moon = Moon("Moon", earth.x + 0.00257 * Planet.AU, 0, sr.moon_radius, OFF_WHITE, 
-    7.34767309 * 10**22, earth.year_to_days, sprites.moon_sprites, True, .069, earth, 30, 0)
+    7.34767309 * 10**22, 0, 0, earth.year_to_days, sprites.moon_sprites, True, .069, earth, 30, 0)
 moon.moon = True
 
 phobos = Moon("Phobos", mars.x + 0.00257 * Planet.AU, 0, sr.phobos_radius, LIGHT_GRAY, 
-    1.060 * 10**16, mars.year_to_days, sprites.phobos_sprites, True, .069, mars, 13, 0)
+    1.060 * 10**16, 0, 0, mars.year_to_days, sprites.phobos_sprites, True, .069, mars, 13, 0)
 phobos.moon = True
 
 deimos = Moon("Deimos", mars.x + 0.00257 * Planet.AU, 0, sr.deimos_radius, REDDISH_GRAY, 
-    1.5 * 10**15, mars.year_to_days, sprites.deimos_sprites, True, .05175, mars, 20, 5)
+    1.5 * 10**15, 0, 0, mars.year_to_days, sprites.deimos_sprites, True, .05175, mars, 20, 5)
 deimos.moon = True
 
 planets = [sun, mercury, venus, earth, mars]
