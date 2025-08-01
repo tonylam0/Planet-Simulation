@@ -11,8 +11,11 @@ An interactive simulation of the inner solar system based on [Tech with Tim's tu
 - Orbit path visualization
 - Rotating Sprites that simulate the light from the Sun
 - Adjustable Simulation Speed that ranges from 0.5x to 3x
-- Zoom-in Camera accessed by either clicking the body or pressing through 1-9 on the keyboard
-- Names of the planets/moons shown when zoomed in (press h to activate/deactivate)
+- Zoom-in Camera centered around a celestial body
+    - Click the body to zoom
+    - Press keys through `1-9` to zoom
+- Names of the planets/moons shown when zoomed in 
+    - Press `H` to activate/deactivate
 
 
 
