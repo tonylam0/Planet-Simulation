@@ -3,7 +3,6 @@
 ## About the Project
 An interactive simulation of the inner solar system based on [Tech with Tim's tutorial](https://youtu.be/WTLPmUHTPqo?si=HZWzYnVGoaiFFwDX), extended with a range of new features, including enhanced visuals and new celestial bodies.
 
-Followed the initial phase of the project through this Tech with Tim tutorial (i.e. planet setup, planet gravitational pull, pygame interface)
 
 
 ## Features
@@ -14,6 +13,7 @@ Followed the initial phase of the project through this Tech with Tim tutorial (i
 - Adjustable Simulation Speed that ranges from 0.5x to 3x
 - Zoom-in Camera accessed by either clicking the body or pressing through 1-9 on the keyboard
 - Names of the planets/moons shown when zoomed in (press h to activate/deactivate)
+
 
 
 ## Preview 
