@@ -20,4 +20,4 @@ An interactive simulation of the inner solar system based on [Tech with Tim's tu
 
 
 ## Preview 
-<img align="center" width="800" height="1636" alt="Screenshot 2025-07-18 at 10 18 06 AM" src="https://github.com/user-attachments/assets/63e861bd-d518-48d7-b8c5-08a7fe0e2f26" />
+https://github.com/user-attachments/assets/206a26ae-eafb-474a-987a-892cb43df47a
