@@ -153,10 +153,10 @@ def main():
 
         body_name(selected_body, hide)
 
-        # # Uncomment to display keybind controls
-        # WINDOW.blit(hide_text, (10, sr.HEIGHT - 44))
-        # WINDOW.blit(camera_text, (10, sr.HEIGHT - 33))
-        # WINDOW.blit(speed_text, (10, sr.HEIGHT - 22))
+        # Uncomment to display keybind controls
+        WINDOW.blit(hide_text, (10, sr.HEIGHT - 44))
+        WINDOW.blit(camera_text, (10, sr.HEIGHT - 33))
+        WINDOW.blit(speed_text, (10, sr.HEIGHT - 22))
 
         pygame.display.update()
 
